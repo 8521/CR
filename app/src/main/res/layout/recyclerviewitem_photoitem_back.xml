@@ -8,7 +8,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <Button
         android:id="@+id/btn_viewphoto"
-        android:elevation="@dimen/dp10"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/rectangular_button_grey_solid_2"
@@ -16,7 +15,6 @@
     <Button
         android:id="@+id/btn_editphoto"
         android:layout_marginTop="@dimen/dp15"
-        android:elevation="@dimen/dp10"
         android:layout_below="@id/btn_viewphoto"
         android:layout_width="match_parent"
         android:background="@drawable/rectangular_button_grey_solid_2"
@@ -25,7 +23,6 @@
     <Button
         android:id="@+id/btn_deletephoto"
         android:layout_marginTop="@dimen/dp15"
-        android:elevation="@dimen/dp10"
         android:layout_below="@id/btn_editphoto"
         android:background="@drawable/rectangular_button_grey_solid_2"
         android:text="@string/Delete"

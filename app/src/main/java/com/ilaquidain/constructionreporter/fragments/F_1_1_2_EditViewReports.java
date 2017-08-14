@@ -1,14 +1,17 @@
 package com.ilaquidain.constructionreporter.fragments;
 
+import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.icu.util.ULocale;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -25,8 +28,12 @@ import com.ilaquidain.constructionreporter.object.Project_Object;
 import com.ilaquidain.constructionreporter.object.Report_Object;
 import com.ilaquidain.constructionreporter.object.Saved_Info_Object;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
+import java.util.Locale;
+import java.util.UUID;
 
 public class F_1_1_2_EditViewReports extends Fragment {
 
@@ -137,7 +144,8 @@ public class F_1_1_2_EditViewReports extends Fragment {
             notifyItemRemoved(position);
         }
     }
-    private class viewholder_edit_reports extends RecyclerView.ViewHolder implements HelperViewHolder31, View.OnClickListener{
+    private class viewholder_edit_reports extends RecyclerView.ViewHolder implements
+            HelperViewHolder31, View.OnClickListener, View.OnLongClickListener{
         final TextView textView1;
         final TextView textView2;
 
@@ -146,6 +154,7 @@ public class F_1_1_2_EditViewReports extends Fragment {
             textView1 = (TextView)itemView.findViewById(R.id.text1);
             textView2 = (TextView)itemView.findViewById(R.id.text2);
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
 
         @Override
@@ -154,13 +163,49 @@ public class F_1_1_2_EditViewReports extends Fragment {
             F_1_1_1_NewReport fgmt = new F_1_1_1_NewReport();
             mpref = getActivity().getPreferences(Context.MODE_PRIVATE);
             mprefedit = mpref.edit();
-            mprefedit = mpref.edit();
             mprefedit.putInt("reportnumber",getAdapterPosition());
             mprefedit.apply();
             fm.beginTransaction()
                     .add(R.id.MainFrame,fgmt,"tag_newreport")
                     .addToBackStack(null)
                     .commit();
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            AlertDialog.Builder buider = new AlertDialog.Builder(getActivity());
+            TextView txtview = new TextView(getActivity());
+            txtview.setText("Duplicate Report");
+            buider.setView(txtview);
+
+
+            txtview.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Report_Object duplicated_report = new Report_Object();
+                    Report_Object original_report = currentproject.getProjectReports().get(getAdapterPosition());
+
+                    duplicated_report.setReportInfo(original_report.getReportInfo());
+                    duplicated_report.setSelectedTasks(original_report.getSelectedTasks());
+                    duplicated_report.setSelectedWorkers(original_report.getSelectedWorkers());
+                    duplicated_report.setSelectedEquipment(original_report.getSelectedEquipment());
+
+                    String currentdate = new SimpleDateFormat("MM/dd/yyyy",Locale.US).format(new Date());
+                    duplicated_report.getReportInfo().set(8,currentdate);
+                    String id = UUID.randomUUID().toString();
+                    duplicated_report.setReportId(id);
+
+                    savedreports.add(duplicated_report);
+                    currentproject.setProjectReports(savedreports);
+                    savedinfo.getSavedProjects().set(projectnumber,currentproject);
+                    ((MainActivity)getActivity()).setSaved_info(savedinfo);
+                    madapter.notifyDataSetChanged();
+
+                }
+            });
+
+            buider.show();
+            return false;
         }
 
         @Override

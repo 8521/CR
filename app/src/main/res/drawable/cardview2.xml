@@ -3,7 +3,7 @@
     <item>
         <shape>
             <solid
-                android:color="@color/lightgray"
+                android:color="@color/lightgray2"
                 android:angle="270"/>
             <stroke
                 android:color="@color/settings_gray_light"

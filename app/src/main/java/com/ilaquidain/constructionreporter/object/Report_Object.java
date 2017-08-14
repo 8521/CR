@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class Report_Object implements Parcelable, Serializable{
+public class Report_Object implements Parcelable, Serializable {
 
     private String ReportId;
     public void setReportId(String ss){ReportId=ss;}
