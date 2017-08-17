@@ -3,11 +3,40 @@ package com.ilaquidain.constructionreporter.object;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class Report_Object implements Parcelable, Serializable {
+public class Report_Object implements Parcelable, Serializable, Cloneable {
+
+    @Override
+    public Report_Object clone() throws CloneNotSupportedException {
+        try{
+            return (Report_Object) super.clone();
+        }catch (CloneNotSupportedException e){
+            return null;
+        }
+    }
+
+    public Report_Object deepClone() {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(this);
+            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            return (Report_Object) ois.readObject();
+        } catch (IOException e) {
+            return null;
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
+    }
 
     private String ReportId;
     public void setReportId(String ss){ReportId=ss;}

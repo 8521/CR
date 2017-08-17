@@ -2,7 +2,6 @@ package com.ilaquidain.constructionreporter.fragments_newreport;
 
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.CursorLoader;
@@ -15,6 +14,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.DocumentsContract;
@@ -42,7 +42,6 @@ import com.ilaquidain.constructionreporter.object.Report_Object;
 import com.ilaquidain.constructionreporter.object.Saved_Info_Object;
 
 import java.io.File;
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -62,12 +61,10 @@ public class Photos_Fragment extends Fragment implements View.OnClickListener{
     private photoadapter madapter;
     private ArrayList<Image_Object> photolist = new ArrayList<>();
     private final ArrayList<Bitmap> photosshown = new ArrayList<>();
-
     private ItemTouchHelper itemtouchhelper12;
     private FloatingActionButton add_Photo;
-
     private Report_Object currentreport;
-
+    private View v;
     private Integer projectnumber, reportnumber;
     private SharedPreferences mpref;
     private Saved_Info_Object savedinfo;
@@ -76,8 +73,7 @@ public class Photos_Fragment extends Fragment implements View.OnClickListener{
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_photos,container,false);
-
+        v = inflater.inflate(R.layout.fragment_photos,container,false);
         SetUpBitMapOptions();
         mpref = getActivity().getPreferences(Context.MODE_PRIVATE);
         projectnumber = mpref.getInt("projectnumber",-1);
@@ -94,12 +90,8 @@ public class Photos_Fragment extends Fragment implements View.OnClickListener{
 
         //currentreport = (Report_Object) getArguments().getSerializable("currentreport");
         //getArguments().remove("currentreport");
-        if(currentreport!=null){
-            photolist=currentreport.getSelectedPhotos();
-            for (int j=0;j<photolist.size();j++){
-                AddBitmapOfPhotoTaken(photolist.get(j).getPathDevice());
-            }
-        }
+
+        new loadphotos().execute();
 
         add_Photo = (FloatingActionButton)v.findViewById(R.id.fabaddphoto);
         add_Photo.setOnClickListener(this);
@@ -123,6 +115,29 @@ public class Photos_Fragment extends Fragment implements View.OnClickListener{
         itemtouchhelper12.attachToRecyclerView(mrecyclerview);
 
         return v;
+    }
+
+    private class loadphotos extends AsyncTask<Void,Void,Void>{
+        @Override
+        protected Void doInBackground(Void... params) {
+            if(currentreport!=null){
+                photolist=currentreport.getSelectedPhotos();
+                for (int j=0;j<photolist.size();j++){
+                    AddBitmapOfPhotoTaken(photolist.get(j).getPathDevice());
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            v.findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            v.findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -231,7 +246,7 @@ public class Photos_Fragment extends Fragment implements View.OnClickListener{
     private void SetUpBitMapOptions() {
         bmOptions = new BitmapFactory.Options();
         bmOptions.inJustDecodeBounds = true;
-        int scaleFactor = 8;
+        int scaleFactor = 16;
         bmOptions.inJustDecodeBounds = false;
         bmOptions.inSampleSize = scaleFactor;
     }
@@ -307,6 +322,8 @@ public class Photos_Fragment extends Fragment implements View.OnClickListener{
             view = (ImageView)itemView.findViewById(R.id.image1);
             viewFlipper.setInAnimation(getActivity(),android.R.anim.slide_in_left);
             viewFlipper.setOutAnimation(getActivity(),android.R.anim.slide_out_right);
+            //viewFlipper.setInAnimation(getActivity(),R.anim.rotation_enter);
+            //viewFlipper.setOutAnimation(getActivity(),R.anim.rotation_exit);
             viewFlipper.setOnClickListener(this);
             itemView.setOnClickListener(this);
         }
@@ -349,7 +366,7 @@ public class Photos_Fragment extends Fragment implements View.OnClickListener{
                     bundle2.putParcelable("bitmap",photosshown.get(getAdapterPosition()));
                     dialog_choose.setArguments(bundle2);
 
-                    dialog_choose.setTargetFragment(currentfragment,2001);
+                    //dialog_choose.setTargetFragment(currentfragment,2001);
                     dialog_choose.show(getFragmentManager(),"Dialog");
                     break;
             }

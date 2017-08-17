@@ -92,4 +92,19 @@
         <item>Medium</item>
         <item>High</item>
     </string-array>
+
+    <string name="fragment_settings">fragment_settings</string>
+    <string name="fragment_menuprojects">fragment_menuprojects</string>
+    <string name="fragment_projectmenu">fragment_projectmenu</string>
+    <string name="fragment_viewpdfs">fragment_viewpdfs</string>
+    <string name="fragment_editviewreports">fragment_editviewreports</string>
+    <string name="fragment_newreport">fragment_newreport"</string>
+    <string name="fragment_equipmentfragment">fragment_equipmentfragment</string>
+    <string name="fragment_manpowerfragment">fragment_manpowerfragment</string>
+    <string name="fragment_newprojectfragment">fragment_newprojectfragment</string>
+    <string name="fragment_photosfragment">fragment_photosfragment</string>
+    <string name="fragment_reportinfofragment">fragment_reportinfofragment</string>
+    <string name="fragment_reporttasksfragment">fragment_reporttasksfragment</string>
+    <string name="fragment_editreport">fragment_editreport</string>
+
 </resources>

@@ -34,8 +34,8 @@ public class F_1_1_3_ViewPdfs extends Fragment{
 
     private Project_Object currentproject;
     private File FolderPathFile;
-    private final ArrayList<String> filesPaths = new ArrayList<>();
-    private final ArrayList<String> filesNames = new ArrayList<>();
+    private ArrayList<String> filesPaths = new ArrayList<>();
+    private ArrayList<String> filesNames = new ArrayList<>();
 
     private RecyclerView mrecyclerview;
     private RecyclerView.Adapter madapter;
@@ -48,7 +48,7 @@ public class F_1_1_3_ViewPdfs extends Fragment{
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_recyclerview,container,false);
 
-        ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
+        //((AppCompatActivity)getActivity()).getSupportActionBar().hide();
 
         savedinfo = ((MainActivity)getActivity()).getSaved_info();
         mpref = getActivity().getPreferences(Context.MODE_PRIVATE);
@@ -116,6 +116,8 @@ public class F_1_1_3_ViewPdfs extends Fragment{
     }
 
     private void ObtainProjectPDFS() {
+        filesPaths = new ArrayList<>();
+        filesNames = new ArrayList<>();
         File directory = new File(FolderPathFile.toString());
         File[] pdfs = directory.listFiles();
         if(pdfs!=null) {
@@ -140,7 +142,7 @@ public class F_1_1_3_ViewPdfs extends Fragment{
         @Override
         public void onBindViewHolder(ViewHolderPDFS holder, int position) {
             holder.textview1.setText(filesNames.get(position));
-            holder.textview2.setText(filesPaths.get(position));
+            //holder.textview2.setText(filesPaths.get(position));
         }
 
         @Override

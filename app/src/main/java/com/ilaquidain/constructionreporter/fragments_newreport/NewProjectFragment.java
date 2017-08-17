@@ -81,15 +81,6 @@ public class NewProjectFragment extends Fragment implements View.OnClickListener
             currentproject = new Project_Object();
         }
 
-        /*if(getArguments()!=null){
-            projectnumber = getArguments().getInt("position");
-            getArguments().remove("position");
-            currentproject = savedinfo.getSavedProjects().get(projectnumber);}
-        else {
-            projectnumber = null;
-            currentproject = new Project_Object();
-        }*/
-
         projectid = currentproject.getProjectId();
         projectname = (EditText)v.findViewById(R.id.df_projectinfo_3);
         projectrefno = (EditText) v.findViewById(R.id.df_projectinfo_6);

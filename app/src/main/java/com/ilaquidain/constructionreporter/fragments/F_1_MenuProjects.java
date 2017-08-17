@@ -2,6 +2,7 @@ package com.ilaquidain.constructionreporter.fragments;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -9,20 +10,18 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.ilaquidain.constructionreporter.R;
@@ -79,7 +78,7 @@ public class F_1_MenuProjects extends Fragment implements View.OnClickListener{
         mpref = getActivity().getPreferences(Context.MODE_PRIVATE);
 
         currentfragment = getActivity().getFragmentManager().findFragmentById(R.id.MainFrame);
-        fm = getFragmentManager();
+        fm = getActivity().getFragmentManager();
 
         mRecyclerView = (RecyclerView)v.findViewById(R.id.recyclerview);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -176,12 +175,13 @@ public class F_1_MenuProjects extends Fragment implements View.OnClickListener{
         public ProjectViewHolder(View itemView) {
             super(itemView);
             cardView = (CardView)itemView.findViewById(R.id.projectcardview);
+            RelativeLayout rellay = (RelativeLayout)cardView.findViewById(R.id.rellay_middle);
             editproject = (ImageButton) itemView.findViewById(R.id.menu_icon);
             projectname = (TextView)itemView.findViewById(R.id.projectname);
             projectrefno = (TextView)itemView.findViewById(R.id.projectrefno);
             projectaddress = (TextView)itemView.findViewById(R.id.projectaddress);
             projectlogo = (SquareImageView)itemView.findViewById(R.id.ProjectLogo);
-            cardView.setOnClickListener(this);
+            rellay.setOnClickListener(this);
             editproject.setOnClickListener(this);
         }
 
@@ -195,29 +195,18 @@ public class F_1_MenuProjects extends Fragment implements View.OnClickListener{
                 case R.id.menu_icon:
                     NewProjectFragment newproject = new NewProjectFragment();
                     newproject.setTargetFragment(currentfragment,5001);
-                    /*bundle = new Bundle();
-                    bundle.putInt("position",getAdapterPosition());
-                    newproject.setArguments(bundle);*/
-                    /*bundle = new Bundle();
-                    Project_Object project_object = mProjects.get(getAdapterPosition());
-                    bundle.putSerializable("currentproject",project_object);
-                    newproject.setArguments(bundle);*/
                     fm.beginTransaction()
-                            .replace(R.id.MainFrame,newproject)
-                            .addToBackStack(null)
+                            .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit)
+                            .replace(R.id.MainFrame,newproject,getResources().getString(R.string.fragment_newprojectfragment))
+                            .addToBackStack(getResources().getString(R.string.fragment_newprojectfragment))
                             .commit();
                     break;
-                case R.id.projectcardview:
-                    F_1_1_ReportMenu mainmenuproject = new F_1_1_ReportMenu();
-                    /*bundle = new Bundle();
-                    bundle.putInt("position",getAdapterPosition());
-                    mainmenuproject.setArguments(bundle);*/
-                    /*mprefedit = mpref.edit();
-                    mprefedit.putInt("projectnumber",getAdapterPosition());
-                    mprefedit.apply();*/
+                case R.id.rellay_middle:
+                    F_1_1_ProjectMenu mainmenuproject = new F_1_1_ProjectMenu();
                     fm.beginTransaction()
-                            .replace(R.id.MainFrame,mainmenuproject)
-                            .addToBackStack(null)
+                            .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit)
+                            .replace(R.id.MainFrame,mainmenuproject,getResources().getString(R.string.fragment_projectmenu))
+                            .addToBackStack(getResources().getString(R.string.fragment_projectmenu))
                             .commit();
                     break;
             }
@@ -244,60 +233,14 @@ public class F_1_MenuProjects extends Fragment implements View.OnClickListener{
                 mprefedit.putInt("projectnumber",-1);
                 mprefedit.apply();
 
-                //bundle = new Bundle();
-                //Project_Object project_object = new Project_Object();
-                //bundle.putSerializable("currentproject",project_object);
-                //newproject.setArguments(bundle);
                 fm.beginTransaction()
-                        .replace(R.id.MainFrame,newproject)
-                        .addToBackStack(null)
+                        .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit)
+                        .replace(R.id.MainFrame,newproject,getResources().getString(R.string.fragment_newprojectfragment))
+                        .addToBackStack(getResources().getString(R.string.fragment_newprojectfragment))
                         .commit();
                 break;
         }
     }
-    /*@Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode== Activity.RESULT_OK&&data!=null){
-            switch (requestCode){
-                case 5001:
-                    //currentproject = (Project_Object)data.getSerializableExtra("currentproject");
-                    saved_info_object = ((MainActivity)getActivity()).getSaved_info();
-
-
-                    *//*Boolean contained = true;
-                    for(int i=0;i<mProjects.size();i++){
-                        if(mProjects.get(i).getProjectId().equals(currentproject.getProjectId())){
-                            mProjects.set(i,currentproject);
-                            contained = false;
-                        }
-                    }
-                    if(contained){
-                        mProjects.add(currentproject);
-                        CreatePdfFileFolder(currentproject.getProjectName());
-                    }*//*
-                    mAdapter.notifyDataSetChanged();
-                    break;
-            }
-        }
-    }*/
-
-    /*private void CreatePdfFileFolder(String projectName) {
-        String MainFolder = "ConstructionReporter";
-        File pdfFolderFile = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_DOCUMENTS),MainFolder);
-        if(!pdfFolderFile.exists()){
-            pdfFolderFile.mkdir();
-            Log.i("TAG","Main Folder Created");
-        }
-        String SecondaryFolder = currentproject.getProjectName();
-        File pdfSecFolderFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)+"/"+
-                MainFolder,SecondaryFolder);
-        if(!pdfSecFolderFile.exists()){
-            pdfSecFolderFile.mkdir();
-            Log.i("TAG","Secondary Folder Created");
-        }
-    }*/
 
     private class HelperCallback14 extends ItemTouchHelper.Callback{
         private static final float ALPHA_FULL = 1.0f;

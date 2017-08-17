@@ -33,6 +33,7 @@
         </activity>
         <activity
             android:name=".activities.MainActivity"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustPan"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
 

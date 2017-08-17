@@ -141,9 +141,9 @@ public class editphoto_dialogfragment extends DialogFragment implements View.OnC
     private void ExitMethod() {
         photoobject.setPhotoDescription(textView2.getText().toString());
         photoobject.setPhotoActivity(spinner.getSelectedItem().toString());
-        Intent intent = new Intent();
-        intent.putExtra("photo", (Serializable) photoobject);
-        getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, intent);
+        //Intent intent = new Intent();
+        //intent.putExtra("photo", (Serializable) photoobject);
+        //getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, intent);
         getDialog().dismiss();
     }
 }

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -13,22 +14,25 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
-
 import com.ilaquidain.constructionreporter.R;
 import com.ilaquidain.constructionreporter.fragments.F_1_1_1_NewReport;
+import com.ilaquidain.constructionreporter.fragments.F_1_1_2_EditViewReports;
+import com.ilaquidain.constructionreporter.fragments.F_1_1_ProjectMenu;
 import com.ilaquidain.constructionreporter.fragments.F_1_MenuProjects;
 import com.ilaquidain.constructionreporter.fragments.Settings_Fragment;
-import com.ilaquidain.constructionreporter.object.Image_Object;
 import com.ilaquidain.constructionreporter.object.Project_Object;
 import com.ilaquidain.constructionreporter.object.Report_Object;
 import com.ilaquidain.constructionreporter.object.Saved_Info_Object;
@@ -47,7 +51,6 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfTemplate;
 import com.itextpdf.text.pdf.PdfWriter;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -57,10 +60,7 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
@@ -98,8 +98,6 @@ public class MainActivity extends AppCompatActivity {
         SaveInfoToMemory();
     }
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         msharedpreferences = this.getPreferences(Context.MODE_PRIVATE);
@@ -117,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
         Fragment fgmt = new F_1_MenuProjects();
         fm.beginTransaction()
                 .add(R.id.MainFrame,fgmt)
+                .addToBackStack(getResources().getString(R.string.fragment_menuprojects))
                 .commit();
     }
 
@@ -140,13 +139,258 @@ public class MainActivity extends AppCompatActivity {
             Settings_Fragment fgmt = new Settings_Fragment();
             fm.beginTransaction()
                     .replace(R.id.MainFrame,fgmt)
-                    .addToBackStack(null)
+                    .addToBackStack(getResources().getString(R.string.fragment_settings))
                     .commit();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if(requestCode==0){
+            if(grantResults.length>0 &&
+                    grantResults[0]!= PackageManager.PERMISSION_GRANTED){
+                Toast toast = Toast.makeText(this,"PDF Could Not be Saved in Device",Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.CENTER,0,0);
+                toast.show();
+            }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        int index = this.getFragmentManager().getBackStackEntryCount() - 1;
+        FragmentManager.BackStackEntry backEntry = getFragmentManager().getBackStackEntryAt(index);
+        String tag = backEntry.getName();
+        final FragmentManager fm = this.getFragmentManager();
+        Fragment fgmt;
+        switch (tag){
+            case "fragment_projectmenu":
+            case "fragment_newprojectfragment":
+                fgmt = new F_1_MenuProjects();
+                fm.beginTransaction()
+                        .setCustomAnimations(R.animator.slide_right_enter,R.animator.slide_left_exit)
+                        .replace(R.id.MainFrame,fgmt,"fragment_menuprojects")
+                        .addToBackStack("fragment_menuprojects")
+                        .commit();
+                break;
+            case "fragment_editviewreports":
+            case "fragment_viewpdfs":
+                fgmt = new F_1_1_ProjectMenu();
+                fm.beginTransaction()
+                        .setCustomAnimations(R.animator.slide_right_enter,R.animator.slide_left_exit)
+                        .replace(R.id.MainFrame,fgmt,"fragment_projectmenu")
+                        .addToBackStack("fragment_projectmenu")
+                        .commit();
+                break;
+            case "fragment_newreport":
+                final Fragment fgmt2 = new F_1_1_ProjectMenu();
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage("Do you want to save the Report before existing?");
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Fragment fragment = getFragmentManager().findFragmentByTag("fragment_newreport");
+                        if(fragment!=null && fragment instanceof F_1_1_1_NewReport){
+                            F_1_1_1_NewReport fmt = (F_1_1_1_NewReport)fragment;
+                            fmt.ExitFragment(0);
+                            fm.beginTransaction()
+                                    .setCustomAnimations(R.animator.slide_right_enter,R.animator.slide_left_exit)
+                                    .replace(R.id.MainFrame,fgmt2,"fragment_projectmenu")
+                                    .addToBackStack("fragment_projectmenu")
+                                    .commit();
+                        }else{
+                            fm.beginTransaction()
+                                    .setCustomAnimations(R.animator.slide_right_enter,R.animator.slide_left_exit)
+                                    .replace(R.id.MainFrame,fgmt2,"fragment_projectmenu")
+                                    .addToBackStack("fragment_projectmenu")
+                                    .commit();
+                        }
+                    }
+                });
+                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        fm.beginTransaction()
+                                .setCustomAnimations(R.animator.slide_right_enter,R.animator.slide_left_exit)
+                                .replace(R.id.MainFrame,fgmt2,"fragment_projectmenu")
+                                .addToBackStack("fragment_projectmenu")
+                                .commit();
+                    }
+                });
+                builder.show();
+                break;
+            case "fragment_reportinfofragment":
+            case "fragment_equipmentfragment":
+            case "fragment_manpowerfragment":
+            case "fragment_photosfragment":
+            case "fragment_reporttasksfragment":
+                fgmt = new F_1_1_1_NewReport();
+                fm.beginTransaction()
+                        .setCustomAnimations(R.animator.slide_right_enter,R.animator.slide_left_exit)
+                        .replace(R.id.MainFrame,fgmt,"fragment_newreport")
+                        .addToBackStack("fragment_newreport")
+                        .commit();
+                break;
+            case "fragment_editreport":
+                fgmt = new F_1_1_2_EditViewReports();
+                fm.beginTransaction()
+                        .setCustomAnimations(R.animator.slide_right_enter,R.animator.slide_left_exit)
+                        .replace(R.id.MainFrame,fgmt,"fragment_editviewreports")
+                        .addToBackStack("fragment_editviewreports")
+                        .commit();
+                break;
+        }
+    }
+
+    /*private void CheckIfAlreadyInstalled() {
+        Boolean firstime = msharedpreferences.getBoolean("FirstTime",true);
+        editor = msharedpreferences.edit();
+        if(firstime){
+            CreateSampleReport();
+            editor.putBoolean("FirstTime",false);
+            editor.apply();
+        }
+    }*/
+    /*private void CreateSampleReport() {
+        Project_Object sampleproject = new Project_Object();
+        sampleproject.setProjectName("Sample Project");
+        sampleproject.setProjectId(UUID.randomUUID().toString());
+        sampleproject.setProjectRefNo("Bridge No.: 0001");
+        sampleproject.setProjectAddress("500 ABC Street, Los Angeles, California");
+
+        editor.putString(OriginatorName,"John Smith");
+        editor.putString(OriginatorPosition,"Field Engineer");
+        editor.putString(OriginatorCompany,"United Contractors");
+        editor.apply();
+
+        Report_Object samplereport = new Report_Object();
+
+        sampleproject = AddPhotos(sampleproject);
+        samplereport = AddPhotosReport(samplereport);
+
+        ArrayList<Worker_Object> reportworkers = new ArrayList<>();
+        for(int i=0;i<10;i++){
+            Worker_Object worker = new Worker_Object();
+            worker.setName("Worker "+String.valueOf(i));
+            worker.setCompany("United Contractors");
+            worker.setActivity("South Tower Construction");
+            worker.setHours("8");
+            reportworkers.add(worker);
+        }
+        samplereport.setSelectedWorkers(reportworkers);
+
+        ArrayList<Task_Object> tasks = new ArrayList<>();
+        Task_Object task = new Task_Object();
+        task.setTaskName("Foundation Construction");
+        task.setTaskDescription(getResources().getString(R.string.sampletaskdescription));
+        tasks.add(task);
+        samplereport.setSelectedTasks(tasks);
+
+        samplereport.getReportInfo().set(4,"United Contractors");
+        samplereport.getReportInfo().set(5,"Fog");
+        samplereport.getReportInfo().set(6,"QC Daily Report");
+        samplereport.getReportInfo().set(7,"Structural");
+        samplereport.getReportInfo().set(8,"07/24/2017");
+        samplereport.getReportInfo().set(10,"05:00");
+        samplereport.getReportInfo().set(11,"14:00");
+
+        ArrayList<Project_Object> savedprojects = new ArrayList<>();
+        sampleproject.getProjectReports().add(samplereport);
+        savedprojects.add(sampleproject);
+        this.getSaved_info().setSavedProjects(savedprojects);
+
+        this.GeneratePDFReport(sampleproject,sampleproject.getProjectReports().indexOf(samplereport));
+    }
+    private Report_Object AddPhotosReport(Report_Object samplereport) {
+        ArrayList<Image_Object> defaultactivityimages = new ArrayList<>();
+        Bitmap sampleimage1 = BitmapFactory.decodeResource(getResources(),R.drawable.samp1);
+        String StorePathLogo4 = "samp1.jpg";
+        try{
+            File f = new File(this.getApplicationContext().getFilesDir(),StorePathLogo4);
+            FileOutputStream fos = new FileOutputStream(f);
+            sampleimage1.compress(Bitmap.CompressFormat.JPEG,100,fos);
+            Image_Object image1 = new Image_Object();
+            image1.setPathDevice(f.getPath());
+            image1.setPhotoDate("Monday 24, July 2017");
+            image1.setPhotoActivity("Sample Project");
+            image1.setPhotoDescription("View Looking North");
+            defaultactivityimages.add(image1);
+            fos.close();
+        }catch (Exception e) {
+            Log.v("log_tag", e.toString());
+        }
+        Bitmap sampleimage2 = BitmapFactory.decodeResource(getResources(),R.drawable.samp2);
+        String StorePathLogo5 = "samp2.jpg";
+        try{
+            File f = new File(this.getApplicationContext().getFilesDir(),StorePathLogo5);
+            FileOutputStream fos = new FileOutputStream(f);
+            sampleimage2.compress(Bitmap.CompressFormat.JPEG,100,fos);
+            Image_Object image1 = new Image_Object();
+            image1.setPathDevice(f.getPath());
+            image1.setPhotoDate("Monday 24, July 2017");
+            image1.setPhotoActivity("Sample Project");
+            image1.setPhotoDescription("Aerial View");
+            defaultactivityimages.add(image1);
+            fos.close();
+        }catch (Exception e) {
+            Log.v("log_tag", e.toString());
+        }
+        Bitmap sampleimage3 = BitmapFactory.decodeResource(getResources(),R.drawable.samp3);
+        String StorePathLogo6 = "samp3.jpg";
+        try{
+            File f = new File(this.getApplicationContext().getFilesDir(),StorePathLogo6);
+            FileOutputStream fos = new FileOutputStream(f);
+            sampleimage3.compress(Bitmap.CompressFormat.JPEG,100,fos);
+            Image_Object image1 = new Image_Object();
+            image1.setPathDevice(f.getPath());
+            image1.setPhotoDate("Monday 24, July 2017");
+            image1.setPhotoActivity("Sample Project");
+            image1.setPhotoDescription("View Looking South");
+            defaultactivityimages.add(image1);
+            fos.close();
+        }catch (Exception e) {
+            Log.v("log_tag", e.toString());
+        }
+        samplereport.setSelectedPhotos(defaultactivityimages);
+        return samplereport;
+    }
+    private Project_Object AddPhotos(Project_Object sampleproject) {
+        Bitmap companylogo = BitmapFactory.decodeResource(getResources(),R.drawable.ggc);
+        String StoredPathLogo = "logo.jpg";
+        try {
+            File f = new File(this.getApplicationContext().getFilesDir(),StoredPathLogo);
+            FileOutputStream fos = new FileOutputStream(f);
+            companylogo.compress(Bitmap.CompressFormat.JPEG,90,fos);
+            fos.close();
+        } catch (Exception e) {
+            Log.v("log_tag", e.toString());
+        }
+        Bitmap signature = BitmapFactory.decodeResource(getResources(),R.drawable.ggs);
+        String StoredPathLogo2 = "signature.jpg";
+        try {
+            File f = new File(this.getApplicationContext().getFilesDir(),StoredPathLogo2);
+            FileOutputStream fos = new FileOutputStream(f);
+            signature.compress(Bitmap.CompressFormat.JPEG,90,fos);
+            fos.close();
+        } catch (Exception e) {
+            Log.v("log_tag", e.toString());
+        }
+        Bitmap projectlogo = BitmapFactory.decodeResource(getResources(),R.drawable.ggi);
+        String StoredPathLogo3 = sampleproject.getProjectId()+".jpg";
+        try {
+            File f = new File(this.getApplicationContext().getFilesDir(),StoredPathLogo3);
+            FileOutputStream fos = new FileOutputStream(f);
+            projectlogo.compress(Bitmap.CompressFormat.JPEG,90,fos);
+            fos.close();
+        } catch (Exception e) {
+            Log.v("log_tag", e.toString());
+        }
+
+        return sampleproject;
+    }*/
 
     public void SaveInfoToMemory() {
         Saved_Info_Object tempinfo = getSaved_info();
@@ -344,167 +588,6 @@ public class MainActivity extends AppCompatActivity {
             this.setSaved_info(savedinfo_2);
         }
     }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if(requestCode==0){
-            if(grantResults.length>0 &&
-                    grantResults[0]!= PackageManager.PERMISSION_GRANTED){
-                Toast toast = Toast.makeText(this,"PDF Could Not be Saved in Device",Toast.LENGTH_SHORT);
-                toast.setGravity(Gravity.CENTER,0,0);
-                toast.show();
-            }
-        }
-    }
-
-
-    /*private void CheckIfAlreadyInstalled() {
-        Boolean firstime = msharedpreferences.getBoolean("FirstTime",true);
-        editor = msharedpreferences.edit();
-        if(firstime){
-            CreateSampleReport();
-            editor.putBoolean("FirstTime",false);
-            editor.apply();
-        }
-    }*/
-    /*private void CreateSampleReport() {
-        Project_Object sampleproject = new Project_Object();
-        sampleproject.setProjectName("Sample Project");
-        sampleproject.setProjectId(UUID.randomUUID().toString());
-        sampleproject.setProjectRefNo("Bridge No.: 0001");
-        sampleproject.setProjectAddress("500 ABC Street, Los Angeles, California");
-
-        editor.putString(OriginatorName,"John Smith");
-        editor.putString(OriginatorPosition,"Field Engineer");
-        editor.putString(OriginatorCompany,"United Contractors");
-        editor.apply();
-
-        Report_Object samplereport = new Report_Object();
-
-        sampleproject = AddPhotos(sampleproject);
-        samplereport = AddPhotosReport(samplereport);
-
-        ArrayList<Worker_Object> reportworkers = new ArrayList<>();
-        for(int i=0;i<10;i++){
-            Worker_Object worker = new Worker_Object();
-            worker.setName("Worker "+String.valueOf(i));
-            worker.setCompany("United Contractors");
-            worker.setActivity("South Tower Construction");
-            worker.setHours("8");
-            reportworkers.add(worker);
-        }
-        samplereport.setSelectedWorkers(reportworkers);
-
-        ArrayList<Task_Object> tasks = new ArrayList<>();
-        Task_Object task = new Task_Object();
-        task.setTaskName("Foundation Construction");
-        task.setTaskDescription(getResources().getString(R.string.sampletaskdescription));
-        tasks.add(task);
-        samplereport.setSelectedTasks(tasks);
-
-        samplereport.getReportInfo().set(4,"United Contractors");
-        samplereport.getReportInfo().set(5,"Fog");
-        samplereport.getReportInfo().set(6,"QC Daily Report");
-        samplereport.getReportInfo().set(7,"Structural");
-        samplereport.getReportInfo().set(8,"07/24/2017");
-        samplereport.getReportInfo().set(10,"05:00");
-        samplereport.getReportInfo().set(11,"14:00");
-
-        ArrayList<Project_Object> savedprojects = new ArrayList<>();
-        sampleproject.getProjectReports().add(samplereport);
-        savedprojects.add(sampleproject);
-        this.getSaved_info().setSavedProjects(savedprojects);
-
-        this.GeneratePDFReport(sampleproject,sampleproject.getProjectReports().indexOf(samplereport));
-    }
-    private Report_Object AddPhotosReport(Report_Object samplereport) {
-        ArrayList<Image_Object> defaultactivityimages = new ArrayList<>();
-        Bitmap sampleimage1 = BitmapFactory.decodeResource(getResources(),R.drawable.samp1);
-        String StorePathLogo4 = "samp1.jpg";
-        try{
-            File f = new File(this.getApplicationContext().getFilesDir(),StorePathLogo4);
-            FileOutputStream fos = new FileOutputStream(f);
-            sampleimage1.compress(Bitmap.CompressFormat.JPEG,100,fos);
-            Image_Object image1 = new Image_Object();
-            image1.setPathDevice(f.getPath());
-            image1.setPhotoDate("Monday 24, July 2017");
-            image1.setPhotoActivity("Sample Project");
-            image1.setPhotoDescription("View Looking North");
-            defaultactivityimages.add(image1);
-            fos.close();
-        }catch (Exception e) {
-            Log.v("log_tag", e.toString());
-        }
-        Bitmap sampleimage2 = BitmapFactory.decodeResource(getResources(),R.drawable.samp2);
-        String StorePathLogo5 = "samp2.jpg";
-        try{
-            File f = new File(this.getApplicationContext().getFilesDir(),StorePathLogo5);
-            FileOutputStream fos = new FileOutputStream(f);
-            sampleimage2.compress(Bitmap.CompressFormat.JPEG,100,fos);
-            Image_Object image1 = new Image_Object();
-            image1.setPathDevice(f.getPath());
-            image1.setPhotoDate("Monday 24, July 2017");
-            image1.setPhotoActivity("Sample Project");
-            image1.setPhotoDescription("Aerial View");
-            defaultactivityimages.add(image1);
-            fos.close();
-        }catch (Exception e) {
-            Log.v("log_tag", e.toString());
-        }
-        Bitmap sampleimage3 = BitmapFactory.decodeResource(getResources(),R.drawable.samp3);
-        String StorePathLogo6 = "samp3.jpg";
-        try{
-            File f = new File(this.getApplicationContext().getFilesDir(),StorePathLogo6);
-            FileOutputStream fos = new FileOutputStream(f);
-            sampleimage3.compress(Bitmap.CompressFormat.JPEG,100,fos);
-            Image_Object image1 = new Image_Object();
-            image1.setPathDevice(f.getPath());
-            image1.setPhotoDate("Monday 24, July 2017");
-            image1.setPhotoActivity("Sample Project");
-            image1.setPhotoDescription("View Looking South");
-            defaultactivityimages.add(image1);
-            fos.close();
-        }catch (Exception e) {
-            Log.v("log_tag", e.toString());
-        }
-        samplereport.setSelectedPhotos(defaultactivityimages);
-        return samplereport;
-    }
-    private Project_Object AddPhotos(Project_Object sampleproject) {
-        Bitmap companylogo = BitmapFactory.decodeResource(getResources(),R.drawable.ggc);
-        String StoredPathLogo = "logo.jpg";
-        try {
-            File f = new File(this.getApplicationContext().getFilesDir(),StoredPathLogo);
-            FileOutputStream fos = new FileOutputStream(f);
-            companylogo.compress(Bitmap.CompressFormat.JPEG,90,fos);
-            fos.close();
-        } catch (Exception e) {
-            Log.v("log_tag", e.toString());
-        }
-        Bitmap signature = BitmapFactory.decodeResource(getResources(),R.drawable.ggs);
-        String StoredPathLogo2 = "signature.jpg";
-        try {
-            File f = new File(this.getApplicationContext().getFilesDir(),StoredPathLogo2);
-            FileOutputStream fos = new FileOutputStream(f);
-            signature.compress(Bitmap.CompressFormat.JPEG,90,fos);
-            fos.close();
-        } catch (Exception e) {
-            Log.v("log_tag", e.toString());
-        }
-        Bitmap projectlogo = BitmapFactory.decodeResource(getResources(),R.drawable.ggi);
-        String StoredPathLogo3 = sampleproject.getProjectId()+".jpg";
-        try {
-            File f = new File(this.getApplicationContext().getFilesDir(),StoredPathLogo3);
-            FileOutputStream fos = new FileOutputStream(f);
-            projectlogo.compress(Bitmap.CompressFormat.JPEG,90,fos);
-            fos.close();
-        } catch (Exception e) {
-            Log.v("log_tag", e.toString());
-        }
-
-        return sampleproject;
-    }*/
-
     public void GeneratePDFReport(Project_Object currentproject, int reportposition){
 
         if(ContextCompat.checkSelfPermission(this,
@@ -585,14 +668,33 @@ public class MainActivity extends AppCompatActivity {
             }
             doc.close();
 
-            Intent ViewPDFIntent = new Intent(Intent.ACTION_VIEW);
+            final String tempstringfilename = reportfilename;
+            Snackbar snackbar = Snackbar
+                    .make(getWindow().getDecorView().getRootView().findViewById(R.id.relativelayout_newreport)
+                            ,"Report Generated Successfully",Snackbar.LENGTH_LONG)
+                    .setAction("View", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent2 = new Intent(Intent.ACTION_VIEW);
+                            intent2.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION |
+                            Intent.FLAG_ACTIVITY_NO_HISTORY);
+                            File f = new File(tempstringfilename);
+                            Uri uri2 = FileProvider.getUriForFile(getApplicationContext(),
+                                    "com.ilaquidain.constructionreporter.provider",f);
+                            intent2.setDataAndType(uri2,getApplicationContext().getContentResolver().getType(uri2));
+                            startActivity(intent2);
+                        }
+                    });
+            snackbar.show();
+
+            /*Intent ViewPDFIntent = new Intent(Intent.ACTION_VIEW);
             ViewPDFIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION |
                     Intent.FLAG_ACTIVITY_NO_HISTORY);
             File f = new File(reportfilename);
             Uri uri = FileProvider.getUriForFile(this,
                     "com.ilaquidain.constructionreporter.provider",f);
             ViewPDFIntent.setDataAndType(uri,this.getContentResolver().getType(uri));
-            startActivity(ViewPDFIntent);
+            startActivity(ViewPDFIntent);*/
 
         }catch (Exception e){
             e.printStackTrace();
@@ -797,7 +899,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
-
     private void CreateEquipmentPage() {
         try{
             par = new Paragraph("\n");
@@ -874,36 +975,27 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
-    private void addrowofdesciptions(int counter) {
+    private void addrowofphotos(int counter) {
         if(counter<imagenes.size()){
-            tempstring = mcurrentreport.getSelectedPhotos().get(counter).getPhotoDescription();
-            if(tempstring==null){tempstring=" ";}
+            per = new PdfPCell(imagenes.get(counter),true);
+            per.setFixedHeight(250);
+            per.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
+            per.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+            per.setPadding(5);
+            table.addCell(per);
         }else {
-            tempstring=" ";
+            addwhitesquare();
         }
-        par = new Paragraph(tempstring,Cal9);
-        per = new PdfPCell(par);
-        per.setBackgroundColor(lightgray);
-        per.setPaddingLeft(5);
-        per.setPaddingTop(2);
-        per.setPaddingBottom(2);
-        per.setBorderWidthTop(0);
-        table.addCell(per);
-
         if(counter+1<imagenes.size()){
-            tempstring = mcurrentreport.getSelectedPhotos().get(counter+1).getPhotoDescription();
-            if(tempstring==null){tempstring=" ";}
+            per = new PdfPCell(imagenes.get(counter+1),true);
+            per.setFixedHeight(250);
+            per.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
+            per.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+            per.setPadding(5);
+            table.addCell(per);
         }else {
-            tempstring=" ";
+            addwhitesquare();
         }
-        par = new Paragraph(tempstring,Cal9);
-        per = new PdfPCell(par);
-        per.setBackgroundColor(lightgray);
-        per.setPaddingLeft(5);
-        per.setPaddingTop(2);
-        per.setPaddingBottom(2);
-        per.setBorderWidthTop(0);
-        table.addCell(per);
     }
     private void addrowofactivities(int counter) {
         if(counter<imagenes.size()){
@@ -969,27 +1061,36 @@ public class MainActivity extends AppCompatActivity {
         per.setBorderWidthBottom(0);
         table.addCell(per);
     }
-    private void addrowofphotos(int counter) {
+    private void addrowofdesciptions(int counter) {
         if(counter<imagenes.size()){
-            per = new PdfPCell(imagenes.get(counter),true);
-            per.setFixedHeight(250);
-            per.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
-            per.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
-            per.setPadding(5);
-            table.addCell(per);
+            tempstring = mcurrentreport.getSelectedPhotos().get(counter).getPhotoDescription();
+            if(tempstring==null){tempstring=" ";}
         }else {
-            addwhitesquare();
+            tempstring=" ";
         }
+        par = new Paragraph(tempstring,Cal9);
+        per = new PdfPCell(par);
+        per.setBackgroundColor(lightgray);
+        per.setPaddingLeft(5);
+        per.setPaddingTop(2);
+        per.setPaddingBottom(5);
+        per.setBorderWidthTop(0);
+        table.addCell(per);
+
         if(counter+1<imagenes.size()){
-            per = new PdfPCell(imagenes.get(counter+1),true);
-            per.setFixedHeight(250);
-            per.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
-            per.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
-            per.setPadding(5);
-            table.addCell(per);
+            tempstring = mcurrentreport.getSelectedPhotos().get(counter+1).getPhotoDescription();
+            if(tempstring==null){tempstring=" ";}
         }else {
-            addwhitesquare();
+            tempstring=" ";
         }
+        par = new Paragraph(tempstring,Cal9);
+        per = new PdfPCell(par);
+        per.setBackgroundColor(lightgray);
+        per.setPaddingLeft(5);
+        per.setPaddingTop(2);
+        per.setPaddingBottom(2);
+        per.setBorderWidthTop(0);
+        table.addCell(per);
     }
     private void addwhitesquare() {
         try{
@@ -1156,7 +1257,7 @@ public class MainActivity extends AppCompatActivity {
     }
     private String RearrangeDate(String date) {
         date = date.replace("/","");
-        date = date.substring(6,8)+date.substring(0,4);
+        date = date.substring(4,6)+date.substring(0,4);
         //String timecreate = new SimpleDateFormat("hhmmss",Locale.US).format(new Date());
         //date = date + "_"+timecreate;
         return date;

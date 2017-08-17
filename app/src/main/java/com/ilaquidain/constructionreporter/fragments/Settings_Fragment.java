@@ -94,7 +94,7 @@ public class Settings_Fragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_settings,container,false);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
+        //((AppCompatActivity)getActivity()).getSupportActionBar().hide();
 
         msharedpreferences = getActivity().getPreferences(Context.MODE_PRIVATE);
         meditor = msharedpreferences.edit();
@@ -139,9 +139,16 @@ public class Settings_Fragment extends Fragment {
                 toast.setGravity(Gravity.CENTER,0,0);
                 toast.show();
                 if ( getFragmentManager().getBackStackEntryCount() > 0)
-                {
-                    getFragmentManager().popBackStack();
-                }
+                {getFragmentManager().popBackStack();}
+            }
+        });
+
+        ImageButton exit = (ImageButton)v.findViewById(R.id.btn_exit);
+        exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if ( getFragmentManager().getBackStackEntryCount() > 0)
+                {getFragmentManager().popBackStack();}
             }
         });
 

@@ -1,18 +1,16 @@
 package com.ilaquidain.constructionreporter.fragments;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +25,7 @@ import com.ilaquidain.constructionreporter.fragments_newreport.Photos_Fragment;
 import com.ilaquidain.constructionreporter.fragments_newreport.ReportInfoFragment;
 import com.ilaquidain.constructionreporter.fragments_newreport.ReportTasksFragment;
 import com.ilaquidain.constructionreporter.fragments_newreport.ManpowerFragment;
+import com.ilaquidain.constructionreporter.object.Image_Object;
 import com.ilaquidain.constructionreporter.object.Project_Object;
 import com.ilaquidain.constructionreporter.object.Report_Object;
 import com.ilaquidain.constructionreporter.object.Saved_Info_Object;
@@ -47,15 +46,17 @@ public class F_1_1_1_NewReport extends Fragment implements View.OnClickListener{
     private Saved_Info_Object savedinfo = null;
     private SharedPreferences mpref;
     private SharedPreferences.Editor mprefedit;
-
+    private View v;
 
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_newreport,container,false);
+        v = inflater.inflate(R.layout.fragment_newreport,container,false);
 
-        ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
+        v.findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+
+        //((AppCompatActivity)getActivity()).getSupportActionBar().hide();
 
         savedinfo = ((MainActivity)getActivity()).getSaved_info();
         mpref = getActivity().getPreferences(Context.MODE_PRIVATE);
@@ -115,7 +116,7 @@ public class F_1_1_1_NewReport extends Fragment implements View.OnClickListener{
         if(currentreport.getReportInfo().get(3).equals("")){
             currentreport.getReportInfo().set(3,savedinfo.getListasOpciones().get(0).get(3));}
         if(currentreport.getReportInfo().get(8).equals("")){
-            currentreport.getReportInfo().set(8,new SimpleDateFormat("MM/dd/yyyy",Locale.US).format(new Date()));}
+            currentreport.getReportInfo().set(8,new SimpleDateFormat("MM/dd/yy",Locale.US).format(new Date()));}
         if(currentreport.getReportInfo().get(6).equals("")){
             currentreport.getReportInfo().set(6,savedinfo.getListasOpciones().get(0).get(6));}
         if (currentreport.getReportInfo().get(7).equals("")){
@@ -137,40 +138,45 @@ public class F_1_1_1_NewReport extends Fragment implements View.OnClickListener{
                 ReportInfoFragment reportinfo = new ReportInfoFragment();
                 reportinfo.setTargetFragment(currentfragment,1002);
                 fm.beginTransaction()
-                        .replace(R.id.MainFrame,reportinfo)
-                        .addToBackStack(null)
+                        .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit)
+                        .replace(R.id.MainFrame,reportinfo,getResources().getString(R.string.fragment_reportinfofragment))
+                        .addToBackStack(getResources().getString(R.string.fragment_reportinfofragment))
                         .commit();
                 break;
             case R.id.lay5:
                 ReportTasksFragment fgmt7 = new ReportTasksFragment();
                 fgmt7.setTargetFragment(currentfragment,1003);
                 fm.beginTransaction()
-                        .replace(R.id.MainFrame,fgmt7)
-                        .addToBackStack(null)
+                        .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit)
+                        .replace(R.id.MainFrame,fgmt7,getResources().getString(R.string.fragment_reporttasksfragment))
+                        .addToBackStack(getResources().getString(R.string.fragment_reporttasksfragment))
                         .commit();
                 break;
             case R.id.lay6:
                 ManpowerFragment dialogmanpower = new ManpowerFragment();
                 dialogmanpower.setTargetFragment(currentfragment,1004);
                 fm.beginTransaction()
-                        .replace(R.id.MainFrame,dialogmanpower)
-                        .addToBackStack(null)
+                        .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit)
+                        .replace(R.id.MainFrame,dialogmanpower,getResources().getString(R.string.fragment_manpowerfragment))
+                        .addToBackStack(getResources().getString(R.string.fragment_manpowerfragment))
                         .commit();
                 break;
             case R.id.lay7:
                 EquipmentFragment dialogequipment = new EquipmentFragment();
                 dialogequipment.setTargetFragment(currentfragment,1005);
                 fm.beginTransaction()
-                        .replace(R.id.MainFrame,dialogequipment)
-                        .addToBackStack(null)
+                        .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit)
+                        .replace(R.id.MainFrame,dialogequipment,getResources().getString(R.string.fragment_equipmentfragment))
+                        .addToBackStack(getResources().getString(R.string.fragment_equipmentfragment))
                         .commit();
                 break;
             case R.id.lay8:
                 Photos_Fragment dialogphotos = new Photos_Fragment();
                 dialogphotos.setTargetFragment(currentfragment,1006);
                 fm.beginTransaction()
-                        .replace(R.id.MainFrame,dialogphotos)
-                        .addToBackStack(null)
+                        .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit)
+                        .replace(R.id.MainFrame,dialogphotos,getResources().getString(R.string.fragment_photosfragment))
+                        .addToBackStack(getResources().getString(R.string.fragment_photosfragment))
                         .commit();
                 break;
             case R.id.fabsave:
@@ -182,40 +188,69 @@ public class F_1_1_1_NewReport extends Fragment implements View.OnClickListener{
         }
     }
 
-    private void ExitFragment(int createpdf) {
-
+    public void ExitFragment(int createpdf) {
+        //Si el informe ya existia y se habia guardado
         if(createpdf==1 && reportnumber != -1){
-            ((MainActivity)getActivity()).GeneratePDFReport(currentproject,reportnumber);
-            Toast toast = Toast.makeText(getActivity(),"PDF Report Created",Toast.LENGTH_SHORT);
+            new GeneratePDF().execute();
+            //((MainActivity)getActivity()).GeneratePDFReport(currentproject,reportnumber);
+            /*Toast toast = Toast.makeText(getActivity(),"PDF Report Created",Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER,0,0);
-            toast.show();
-        }else if(createpdf==1 && reportnumber ==-1){
+            toast.show();*/
+            //Si el informe no exisitia - primero se guarda y luego se genera el PDF
+        }else if(createpdf==1){
             currentproject.getProjectReports().add(currentreport);
             savedinfo.getSavedProjects().set(projectnumber,currentproject);
             ((MainActivity)getActivity()).setSaved_info(savedinfo);
-            ((MainActivity)getActivity()).GeneratePDFReport(currentproject,currentproject.getProjectReports().size()-1);
-            Toast toast = Toast.makeText(getActivity(),"PDF Report Created",Toast.LENGTH_SHORT);
+            new GeneratePDF().execute();
+            /*Toast toast = Toast.makeText(getActivity(),"PDF Report Created",Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER,0,0);
-            toast.show();
+            toast.show();*/
         } else {
+            //Solo se guarda un informe nuevo per no se genera el` PDF
             if(reportnumber == -1){
                 currentproject.getProjectReports().add(savedinfo.getTempreport());
             }else {
+                //Se guardan los cambios en un informe que ya existia pero no se modifica
                 currentproject.getProjectReports().set(reportnumber,currentreport);
             }
-            Toast toast = Toast.makeText(getActivity(),"Report Saved Succesfully",Toast.LENGTH_SHORT);
+            Snackbar.make(getActivity().getWindow().getDecorView().getRootView().findViewById(R.id.relativelayout_newreport),
+                    "Report Saved Succesfully",Snackbar.LENGTH_SHORT).show();
+            /*Toast toast = Toast.makeText(getActivity(),"Report Saved Succesfully",Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER,0,0);
-            toast.show();
+            toast.show();*/
         }
         savedinfo.getSavedProjects().set(projectnumber,currentproject);
         ((MainActivity)getActivity()).setSaved_info(savedinfo);
 
+        /*F_1_1_ProjectMenu fgmt = new F_1_1_ProjectMenu();
         FragmentManager fm = getFragmentManager();
-        F_1_1_ReportMenu fgmt = new F_1_1_ReportMenu();
         fm.beginTransaction()
-                .replace(R.id.MainFrame,fgmt)
-                .addToBackStack(null)
-                .commit();
+                .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit)
+                .replace(R.id.MainFrame,fgmt,getResources().getString(R.string.fragment_projectmenu))
+                .addToBackStack(getResources().getString(R.string.fragment_projectmenu))
+                .commit();*/
 
+    }
+
+    private class GeneratePDF extends AsyncTask<Void,Void,Void>{
+        @Override
+        protected Void doInBackground(Void... params) {
+            if(reportnumber==-1){
+                ((MainActivity)getActivity()).GeneratePDFReport(currentproject,currentproject.getProjectReports().size()-1);
+            }else {
+                ((MainActivity)getActivity()).GeneratePDFReport(currentproject,reportnumber);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            v.findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            v.findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+        }
     }
 }

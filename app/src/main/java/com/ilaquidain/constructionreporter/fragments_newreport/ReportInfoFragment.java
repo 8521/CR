@@ -189,7 +189,8 @@ public class ReportInfoFragment extends Fragment implements View.OnClickListener
                         endtime.setText(currentreport.getReportInfo().get(11));
                     }
                 });
-                dialog_choose.show(getFragmentManager(),"Dialog2");
+                dialog_choose.show(getActivity().getFragmentManager(),"Dialog");
+                //dialog_choose.show(getFragmentManager(),"Dialog2");
                 break;
         }
     }

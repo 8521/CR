@@ -24,13 +24,11 @@ import com.ilaquidain.constructionreporter.object.SquareImageView;
 import java.io.File;
 import java.io.FileInputStream;
 
-public class F_1_1_ReportMenu extends Fragment implements View.OnClickListener {
+public class F_1_1_ProjectMenu extends Fragment implements View.OnClickListener {
 
     private FragmentManager fm;
     private Saved_Info_Object savedinfo;
     private Project_Object currentproject;
-    private Bundle bundle;
-
     private SharedPreferences mpref;
     private SharedPreferences.Editor mprefedit;
     private Integer projectnumber;
@@ -48,11 +46,6 @@ public class F_1_1_ReportMenu extends Fragment implements View.OnClickListener {
             if ( getFragmentManager().getBackStackEntryCount() > 0)
             {getFragmentManager().popBackStack();}
         }
-
-        /*projectnumber = getArguments().getInt("position");
-        savedinfo = ((MainActivity)getActivity()).getSaved_info();
-        if(savedinfo!=null && projectnumber!=null){
-            currentproject = savedinfo.getSavedProjects().get(projectnumber);}*/
     }
 
     @Override
@@ -66,7 +59,7 @@ public class F_1_1_ReportMenu extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_main,container,false);
 
-        ((AppCompatActivity)getActivity()).getSupportActionBar().show();
+        //((AppCompatActivity)getActivity()).getSupportActionBar().show();
 
         TextView projectname = (TextView)v.findViewById(R.id.projectname);
         TextView projectref = (TextView)v.findViewById(R.id.projectrefno);
@@ -110,35 +103,25 @@ public class F_1_1_ReportMenu extends Fragment implements View.OnClickListener {
                 mprefedit.apply();
 
                 fm.beginTransaction()
-                        .add(R.id.MainFrame,fgmt,"tag_newreport")
-                        .addToBackStack(null)
+                        .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit)
+                        .add(R.id.MainFrame,fgmt,getResources().getString(R.string.fragment_newreport))
+                        .addToBackStack(getResources().getString(R.string.fragment_newreport))
                         .commit();
                 break;
             case R.id.OptionB:
                 F_1_1_2_EditViewReports fgmt2 = new F_1_1_2_EditViewReports();
-                /*mprefedit = mpref.edit();
-                mprefedit.putInt("projectnumber", projectnumber);
-                mprefedit.apply();*/
-                /*bundle = new Bundle();
-                bundle.putSerializable("currentproject",currentproject);
-                bundle.putInt("projectnumber", projectnumber);
-                fgmt2.setArguments(bundle);*/
                 fm.beginTransaction()
-                        .replace(R.id.MainFrame,fgmt2)
-                        .addToBackStack(null)
+                        .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit)
+                        .replace(R.id.MainFrame,fgmt2,getResources().getString(R.string.fragment_editviewreports))
+                        .addToBackStack(getResources().getString(R.string.fragment_editviewreports))
                         .commit();
                 break;
             case R.id.RelLay_ViewPDFs:
                 F_1_1_3_ViewPdfs fgmt4 = new F_1_1_3_ViewPdfs();
-                /*mprefedit = mpref.edit();
-                mprefedit.putInt("projectnumber",projectnumber);
-                mprefedit.apply();
-                bundle = new Bundle();
-                bundle.putSerializable("currentproject",currentproject);
-                fgmt4.setArguments(bundle);*/
                 fm.beginTransaction()
-                        .replace(R.id.MainFrame,fgmt4)
-                        .addToBackStack(null)
+                        .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit)
+                        .replace(R.id.MainFrame,fgmt4,getResources().getString(R.string.fragment_viewpdfs))
+                        .addToBackStack(getResources().getString(R.string.fragment_viewpdfs))
                         .commit();
                 break;
         }

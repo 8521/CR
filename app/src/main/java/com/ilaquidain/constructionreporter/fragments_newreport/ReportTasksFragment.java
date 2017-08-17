@@ -1,11 +1,9 @@
 package com.ilaquidain.constructionreporter.fragments_newreport;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -192,11 +190,12 @@ public class ReportTasksFragment extends Fragment implements View.OnClickListene
             savedinfo.getSavedProjects().get(projectnumber).getProjectReports().set(reportnumber,currentreport);
         }
         ((MainActivity)getActivity()).setSaved_info(savedinfo);
+
         FragmentManager fm = getFragmentManager();
         F_1_1_1_NewReport fgmt = new F_1_1_1_NewReport();
         fm.beginTransaction()
-                .add(R.id.MainFrame,fgmt,"tag_newreport")
-                .addToBackStack(null)
+                .add(R.id.MainFrame,fgmt,getResources().getString(R.string.fragment_newreport))
+                .addToBackStack(getResources().getString(R.string.fragment_newreport))
                 .commit();
     }
 
