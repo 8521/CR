@@ -18,6 +18,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -257,6 +258,9 @@ public class chooselist_dialogfragment extends DialogFragment implements View.On
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Add New Option");
         final EditText edittext = new EditText(getActivity());
+        edittext.setInputType(InputType.TYPE_CLASS_TEXT |
+                InputType.TYPE_TEXT_FLAG_CAP_SENTENCES |
+                InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         builder.setView(edittext);
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override

@@ -9,9 +9,11 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -77,6 +79,9 @@ public class edittask_dialogfragment extends DialogFragment implements View.OnCl
 
         task = currentreport.getSelectedTasks().get(tasknumber);
         editText = (EditText)v.findViewById(R.id.edittext1);
+        editText.setInputType(InputType.TYPE_CLASS_TEXT |
+                InputType.TYPE_TEXT_FLAG_CAP_SENTENCES |
+                InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         TextView title = (TextView)v.findViewById(R.id.recyclerviewtitle);
 
         if(task!=null){

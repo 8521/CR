@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -104,6 +105,9 @@ public class editphoto_dialogfragment extends DialogFragment implements View.OnC
                 title.setText(getResources().getText(R.string.PhotoDescription));
 
                 final EditText editText = (EditText)v3.findViewById(R.id.edittext1);
+                editText.setInputType(InputType.TYPE_CLASS_TEXT |
+                        InputType.TYPE_TEXT_FLAG_CAP_SENTENCES |
+                        InputType.TYPE_TEXT_FLAG_MULTI_LINE);
                 ImageButton accept = (ImageButton)v3.findViewById(R.id.fabaccept);
                 ImageButton cancel = (ImageButton)v3.findViewById(R.id.fabcancel);
 

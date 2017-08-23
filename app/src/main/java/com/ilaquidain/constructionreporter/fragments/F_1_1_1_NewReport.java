@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.ilaquidain.constructionreporter.R;
 import com.ilaquidain.constructionreporter.activities.MainActivity;
 import com.ilaquidain.constructionreporter.fragments_newreport.EquipmentFragment;
+import com.ilaquidain.constructionreporter.fragments_newreport.ManEquipFragment;
 import com.ilaquidain.constructionreporter.fragments_newreport.Photos_Fragment;
 import com.ilaquidain.constructionreporter.fragments_newreport.ReportInfoFragment;
 import com.ilaquidain.constructionreporter.fragments_newreport.ReportTasksFragment;
@@ -136,7 +137,7 @@ public class F_1_1_1_NewReport extends Fragment implements View.OnClickListener{
         switch (v.getId()){
             case R.id.lay1:
                 ReportInfoFragment reportinfo = new ReportInfoFragment();
-                reportinfo.setTargetFragment(currentfragment,1002);
+                //reportinfo.setTargetFragment(currentfragment,1002);
                 fm.beginTransaction()
                         .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit)
                         .replace(R.id.MainFrame,reportinfo,getResources().getString(R.string.fragment_reportinfofragment))
@@ -145,7 +146,7 @@ public class F_1_1_1_NewReport extends Fragment implements View.OnClickListener{
                 break;
             case R.id.lay5:
                 ReportTasksFragment fgmt7 = new ReportTasksFragment();
-                fgmt7.setTargetFragment(currentfragment,1003);
+                //fgmt7.setTargetFragment(currentfragment,1003);
                 fm.beginTransaction()
                         .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit)
                         .replace(R.id.MainFrame,fgmt7,getResources().getString(R.string.fragment_reporttasksfragment))
@@ -153,26 +154,42 @@ public class F_1_1_1_NewReport extends Fragment implements View.OnClickListener{
                         .commit();
                 break;
             case R.id.lay6:
-                ManpowerFragment dialogmanpower = new ManpowerFragment();
+                mpref.edit().putString("itemstype","manpower").apply();
+                ManEquipFragment fragment1 = new ManEquipFragment();
+                //fragment1.setTargetFragment(currentfragment,1005);
+                fm.beginTransaction()
+                        .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit)
+                        .replace(R.id.MainFrame,fragment1,getResources().getString(R.string.fragment_equipmentfragment))
+                        .addToBackStack(getResources().getString(R.string.fragment_equipmentfragment))
+                        .commit();
+                /*ManpowerFragment dialogmanpower = new ManpowerFragment();
                 dialogmanpower.setTargetFragment(currentfragment,1004);
                 fm.beginTransaction()
                         .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit)
                         .replace(R.id.MainFrame,dialogmanpower,getResources().getString(R.string.fragment_manpowerfragment))
                         .addToBackStack(getResources().getString(R.string.fragment_manpowerfragment))
-                        .commit();
+                        .commit();*/
                 break;
             case R.id.lay7:
-                EquipmentFragment dialogequipment = new EquipmentFragment();
+                mpref.edit().putString("itemstype","equipment").apply();
+                ManEquipFragment fragment2 = new ManEquipFragment();
+                //fragment2.setTargetFragment(currentfragment,1005);
+                fm.beginTransaction()
+                    .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit)
+                    .replace(R.id.MainFrame,fragment2,getResources().getString(R.string.fragment_equipmentfragment))
+                    .addToBackStack(getResources().getString(R.string.fragment_equipmentfragment))
+                    .commit();
+                /*EquipmentFragment dialogequipment = new EquipmentFragment();
                 dialogequipment.setTargetFragment(currentfragment,1005);
                 fm.beginTransaction()
                         .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit)
                         .replace(R.id.MainFrame,dialogequipment,getResources().getString(R.string.fragment_equipmentfragment))
                         .addToBackStack(getResources().getString(R.string.fragment_equipmentfragment))
-                        .commit();
+                        .commit()*/;
                 break;
             case R.id.lay8:
                 Photos_Fragment dialogphotos = new Photos_Fragment();
-                dialogphotos.setTargetFragment(currentfragment,1006);
+                //dialogphotos.setTargetFragment(currentfragment,1006);
                 fm.beginTransaction()
                         .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit)
                         .replace(R.id.MainFrame,dialogphotos,getResources().getString(R.string.fragment_photosfragment))

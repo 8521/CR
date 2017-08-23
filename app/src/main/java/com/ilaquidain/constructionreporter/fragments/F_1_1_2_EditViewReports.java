@@ -187,8 +187,7 @@ public class F_1_1_2_EditViewReports extends Fragment {
                 public void onClick(DialogInterface dialog, int which) {
                     Report_Object duplicated_report;
                     try{
-                        duplicated_report = (Report_Object)
-                            currentproject.getProjectReports().get(getAdapterPosition()).deepClone();
+                        duplicated_report = currentproject.getProjectReports().get(getAdapterPosition()).deepClone();
                         String currentdate = new SimpleDateFormat("MM/dd/yy",Locale.US).format(new Date());
                         duplicated_report.getReportInfo().set(8,currentdate);
                         String id = UUID.randomUUID().toString();

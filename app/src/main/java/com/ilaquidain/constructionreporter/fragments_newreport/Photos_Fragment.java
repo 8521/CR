@@ -207,8 +207,28 @@ public class Photos_Fragment extends Fragment implements View.OnClickListener{
     }
     private String getImagePathFromUri(Uri Uri1){
 
-        String pathfromuri = "";
-        if(Build.VERSION.SDK_INT>=19){
+        String pathfromuri = null;
+        if(Uri1 == null){return null;}
+        try {
+            String WholeID = DocumentsContract.getDocumentId(Uri1);
+            String id = WholeID.split(":")[1];
+            String[] column = {MediaStore.Images.Media.DATA};
+            String sel = MediaStore.Images.Media._ID+"=?";
+            Cursor cursor = getActivity().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    column, sel, new String[]{ id }, null);
+            int columnIndex = cursor.getColumnIndex(column[0]);
+            if (cursor.moveToFirst()) {pathfromuri = cursor.getString(columnIndex);}
+            cursor.close();
+        }catch (Exception e){
+            String[] filePathColumn = { MediaStore.Images.Media.DATA };
+            Cursor cursor = getActivity().getContentResolver().query(Uri1, filePathColumn, null, null, null);
+            cursor.moveToFirst();
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            pathfromuri = cursor.getString(columnIndex);
+            cursor.close();
+        }
+        return pathfromuri;
+        /*if(Build.VERSION.SDK_INT>=19){
             String WholeID = DocumentsContract.getDocumentId(Uri1);
             String id = WholeID.split(":")[1];
             String[] column = {MediaStore.Images.Media.DATA};
@@ -237,7 +257,7 @@ public class Photos_Fragment extends Fragment implements View.OnClickListener{
                 pathfromuri = cursor.getString(column_index);
             }
             return pathfromuri;
-        }
+        }*/
     }
     private void AddBitmapOfPhotoTaken(String PhotoPath){
         Bitmap bitmap = BitmapFactory.decodeFile(PhotoPath, bmOptions);
@@ -382,6 +402,9 @@ public class Photos_Fragment extends Fragment implements View.OnClickListener{
 
         @Override
         public void onItemClear() {
+            itemView.setBackgroundColor(
+                    ContextCompat.getColor(getActivity(),R.color.white)
+            );
         }
     }
     private class HelperCallback12 extends ItemTouchHelper.Callback{

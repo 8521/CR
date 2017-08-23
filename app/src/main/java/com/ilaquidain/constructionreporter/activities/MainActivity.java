@@ -866,36 +866,161 @@ public class MainActivity extends AppCompatActivity {
     }
     private void CreateManPowerPage(){
         doc.newPage();
-        try{
-            table = new PdfPTable(14);
-            table.setWidthPercentage(100);
-            per = getCell_15(14,"Manpower");
-            per.setBackgroundColor(lightgray);
-            table.addCell(per);
 
-            per = getCell_15(5,"Name");per.setBackgroundColor(lightgray);
-            table.addCell(per);
-            per = getCell_15(4,"Contractor");per.setBackgroundColor(lightgray);
-            table.addCell(per);
-            per = getCell_15(4,"Activity");per.setBackgroundColor(lightgray);
-            table.addCell(per);
-            per = getCell_15(1,"Hours");per.setBackgroundColor(lightgray);
-            table.addCell(per);
+        ArrayList<Worker_Object> workers = mcurrentreport.getSelectedWorkers();
+        ArrayList<Worker_Object> equipmet = mcurrentreport.getSelectedEquipment();
+        if(workers.size()+equipmet.size()<40) {
+            try {
+                par = new Paragraph("\n");
+                doc.add(par);
 
-            ArrayList<Worker_Object> workers = mcurrentreport.getSelectedWorkers();
-            for(int i=0;i<workers.size();i++){
-                per = getCell_15(5,workers.get(i).getName());
+                table = new PdfPTable(14);
+                table.setWidthPercentage(100);
+                per = getCell_15(14, "Manpower");
+                per.setBackgroundColor(lightgray);
                 table.addCell(per);
-                per = getCell_15(4,workers.get(i).getCompany());
+
+                per = getCell_15(5, "Name");
+                per.setBackgroundColor(lightgray);
                 table.addCell(per);
-                per = getCell_15(4,workers.get(i).getActivity());
+                per = getCell_15(4, "Contractor");
+                per.setBackgroundColor(lightgray);
                 table.addCell(per);
-                per = getCell_15(1,workers.get(i).getHours());
+                per = getCell_15(4, "Activity");
+                per.setBackgroundColor(lightgray);
                 table.addCell(per);
+                per = getCell_15(1, "Hours");
+                per.setBackgroundColor(lightgray);
+                table.addCell(per);
+
+
+                for (int i = 0; i < workers.size(); i++) {
+                    per = getCell_15(5, workers.get(i).getName());
+                    table.addCell(per);
+                    per = getCell_15(4, workers.get(i).getCompany());
+                    table.addCell(per);
+                    per = getCell_15(4, workers.get(i).getActivity());
+                    table.addCell(per);
+                    per = getCell_15(1, workers.get(i).getHours());
+                    table.addCell(per);
+                }
+                doc.add(table);
+            } catch (DocumentException e) {
+                e.printStackTrace();
             }
-            doc.add(table);
-        }catch (DocumentException e){
-            e.printStackTrace();
+        }else if (workers.size()<=40){
+            try {
+                par = new Paragraph("\n");
+                doc.add(par);
+
+                table = new PdfPTable(14);
+                table.setWidthPercentage(100);
+                per = getCell_15(14, "Manpower");
+                per.setBackgroundColor(lightgray);
+                table.addCell(per);
+
+                per = getCell_15(5, "Name");
+                per.setBackgroundColor(lightgray);
+                table.addCell(per);
+                per = getCell_15(4, "Contractor");
+                per.setBackgroundColor(lightgray);
+                table.addCell(per);
+                per = getCell_15(4, "Activity");
+                per.setBackgroundColor(lightgray);
+                table.addCell(per);
+                per = getCell_15(1, "Hours");
+                per.setBackgroundColor(lightgray);
+                table.addCell(per);
+
+
+                for (int i = 0; i < workers.size(); i++) {
+                    per = getCell_15(5, workers.get(i).getName());
+                    table.addCell(per);
+                    per = getCell_15(4, workers.get(i).getCompany());
+                    table.addCell(per);
+                    per = getCell_15(4, workers.get(i).getActivity());
+                    table.addCell(per);
+                    per = getCell_15(1, workers.get(i).getHours());
+                    table.addCell(per);
+                }
+                doc.add(table);
+            } catch (DocumentException e) {
+                e.printStackTrace();
+            }
+            doc.newPage();
+        }else if(workers.size()>40){
+            try {
+                par = new Paragraph("\n");
+                doc.add(par);
+
+                table = new PdfPTable(14);
+                table.setWidthPercentage(100);
+                per = getCell_15(14, "Manpower");
+                per.setBackgroundColor(lightgray);
+                table.addCell(per);
+
+                per = getCell_15(5, "Name");
+                per.setBackgroundColor(lightgray);
+                table.addCell(per);
+                per = getCell_15(4, "Contractor");
+                per.setBackgroundColor(lightgray);
+                table.addCell(per);
+                per = getCell_15(4, "Activity");
+                per.setBackgroundColor(lightgray);
+                table.addCell(per);
+                per = getCell_15(1, "Hours");
+                per.setBackgroundColor(lightgray);
+                table.addCell(per);
+
+                for (int i = 0; i < 40; i++) {
+                    per = getCell_15(5, workers.get(i).getName());
+                    table.addCell(per);
+                    per = getCell_15(4, workers.get(i).getCompany());
+                    table.addCell(per);
+                    per = getCell_15(4, workers.get(i).getActivity());
+                    table.addCell(per);
+                    per = getCell_15(1, workers.get(i).getHours());
+                    table.addCell(per);
+                }
+                doc.add(table);
+
+                doc.newPage();
+                par = new Paragraph("\n");
+                doc.add(par);
+
+                table = new PdfPTable(14);
+                table.setWidthPercentage(100);
+                per = getCell_15(14, "Manpower");
+                per.setBackgroundColor(lightgray);
+                table.addCell(per);
+
+                per = getCell_15(5, "Name");
+                per.setBackgroundColor(lightgray);
+                table.addCell(per);
+                per = getCell_15(4, "Contractor");
+                per.setBackgroundColor(lightgray);
+                table.addCell(per);
+                per = getCell_15(4, "Activity");
+                per.setBackgroundColor(lightgray);
+                table.addCell(per);
+                per = getCell_15(1, "Hours");
+                per.setBackgroundColor(lightgray);
+                table.addCell(per);
+
+                for (int i = 40; i < workers.size(); i++) {
+                    per = getCell_15(5, workers.get(i).getName());
+                    table.addCell(per);
+                    per = getCell_15(4, workers.get(i).getCompany());
+                    table.addCell(per);
+                    per = getCell_15(4, workers.get(i).getActivity());
+                    table.addCell(per);
+                    per = getCell_15(1, workers.get(i).getHours());
+                    table.addCell(per);
+                }
+                doc.add(table);
+            } catch (DocumentException e) {
+                e.printStackTrace();
+            }
         }
 
     }

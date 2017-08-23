@@ -1,9 +1,7 @@
 package com.ilaquidain.constructionreporter.fragments_newreport;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -34,21 +32,24 @@ import com.ilaquidain.constructionreporter.object.Report_Object;
 import com.ilaquidain.constructionreporter.object.Saved_Info_Object;
 import com.ilaquidain.constructionreporter.object.Worker_Object;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class ManpowerFragment extends Fragment {
+public class ManEquipFragment extends Fragment {
 
     private final static String level0 = "level0";
     private final static String level1 = "level1";
     private final static String level2 = "level2";
-
+    private final static String manpower = "manpower";
+    private final static String equipment = "equipment";
     private final static String title1 = "Manpower Selected";
     private final static String title2 = "Manpower Categories";
     private final static String title3 = "Manpower";
+    private final static String title4 = "Equipment Selected";
+    private final static String title5 = "Equipment Categories";
+    private final static String title6 = "Equipmet";
 
     private int lightred;
 
@@ -57,8 +58,9 @@ public class ManpowerFragment extends Fragment {
     private ItemTouchHelper mhelper_6;
     private TextView titleview;
 
-    private ArrayList<String> groups;
-    private ArrayList<ArrayList<Worker_Object>> manpower;
+    private ArrayList<String> grouparray;
+    private ArrayList<ArrayList<Worker_Object>> availableitemsarray;
+    private String itemstype;
     private String level;
 
     private FloatingActionButton fabaccept;
@@ -84,7 +86,11 @@ public class ManpowerFragment extends Fragment {
         }else {
             savedinfo.getSavedProjects().get(projectnumber).getProjectReports().set(reportnumber,currentreport);
         }
-        savedinfo.setListAvailableManpower(manpower);
+        if(itemstype.equals(manpower)){
+            savedinfo.setListAvailableManpower(availableitemsarray);}
+        else if(itemstype.equals(equipment)){
+            savedinfo.setListAvailableEquipment(availableitemsarray);
+        }
         ((MainActivity)getActivity()).setSaved_info(savedinfo);
         if ( getFragmentManager().getBackStackEntryCount() > 0)
         {getFragmentManager().popBackStack();}
@@ -96,13 +102,20 @@ public class ManpowerFragment extends Fragment {
         View v = inflater.inflate(R.layout.dialogfragment_manpower,container,false);
         level = level0;
 
-        titleview = (TextView)v.findViewById(R.id.recyclerviewtitle);
-        titleview.setText(title1);
+
         lightred = ContextCompat.getColor(getActivity(),R.color.selection_light_orange);
 
         mpref = getActivity().getPreferences(Context.MODE_PRIVATE);
         projectnumber = mpref.getInt("projectnumber",-1);
         reportnumber = mpref.getInt("reportnumber",-1);
+        itemstype = mpref.getString("itemstype",manpower);
+        titleview = (TextView)v.findViewById(R.id.recyclerviewtitle);
+        if(itemstype.equals(manpower)){
+            titleview.setText(title1);
+        }else if(itemstype.equals(equipment)){
+            titleview.setText(title4);
+        }
+
         savedinfo = ((MainActivity)getActivity()).getSaved_info();
         if(savedinfo!=null && projectnumber != -1 && reportnumber!=-1) {
             currentreport = savedinfo.getSavedProjects().get(projectnumber).getProjectReports().get(reportnumber);
@@ -114,8 +127,13 @@ public class ManpowerFragment extends Fragment {
         }
 
         //currentreport.setSelectedWorkers(new ArrayList<Worker_Object>());
-        groups = new ArrayList<>(savedinfo.getWorkerGroups());
-        manpower = new ArrayList<>(savedinfo.getListAvailableManpower());
+        if(itemstype.equals(manpower)){
+            grouparray = new ArrayList<>(savedinfo.getWorkerGroups());
+            availableitemsarray = new ArrayList<>(savedinfo.getListAvailableManpower());
+        }else if (itemstype.equals(equipment)){
+            grouparray = new ArrayList<>(savedinfo.getEquipmentGroups());
+            availableitemsarray = new ArrayList<>(savedinfo.getListAvailableEquipment());
+        }
 
         FloatingActionButton fabadd = (FloatingActionButton)v.findViewById(R.id.fabaddmanpower);
         fabadd.setOnClickListener(new View.OnClickListener() {
@@ -124,7 +142,11 @@ public class ManpowerFragment extends Fragment {
                 switch (level){
                     case level0:
                         level = level1;
-                        titleview.setText(title2);
+                        if(itemstype.equals(manpower)) {
+                            titleview.setText(title2);
+                        }else if(itemstype.equals(equipment)){
+                            titleview.setText(title5);
+                        }
                         mrecyclerview_6.setAdapter(null);
                         mrecyclerview_6.setAdapter(madapter_6);
                         break;
@@ -155,7 +177,11 @@ public class ManpowerFragment extends Fragment {
                         break;
                     case level2:
                         level = level1;
-                        titleview.setText(title2);
+                        if(itemstype.equals(manpower)) {
+                            titleview.setText(title2);
+                        }else if(itemstype.equals(equipment)){
+                            titleview.setText(title5);
+                        }
                         mrecyclerview_6.setAdapter(null);
                         mrecyclerview_6.setAdapter(madapter_6);
                 }
@@ -211,27 +237,45 @@ public class ManpowerFragment extends Fragment {
             switch (level){
                 case level0:
                     holder.itemView.setBackgroundColor(0);
-                    holder.textView1.setText(currentreport.getSelectedWorkers().get(position).getName());
-                    holder.textView2.setText(currentreport.getSelectedWorkers().get(position).getActivity());
-                    holder.textView3.setText(currentreport.getSelectedWorkers().get(position).getCompany());
                     List<String> tem = Arrays.asList(getResources().getStringArray(R.array.hours));
-                    holder.hourspinner.setSelection(tem.indexOf(currentreport.getSelectedWorkers().get(position).getHours()));
+                    if(itemstype.equals(manpower)) {
+                        holder.textView1.setText(currentreport.getSelectedWorkers().get(position).getName());
+                        holder.textView2.setText(currentreport.getSelectedWorkers().get(position).getActivity());
+                        holder.textView3.setText(currentreport.getSelectedWorkers().get(position).getCompany());
+                        holder.hourspinner.setSelection(tem.indexOf(currentreport.
+                                getSelectedWorkers().get(position).getHours()));
+                    }else if(itemstype.equals(equipment)){
+                        holder.textView1.setText(currentreport.getSelectedEquipment().get(position).getName());
+                        holder.textView2.setText(currentreport.getSelectedEquipment().get(position).getActivity());
+                        holder.textView3.setText(currentreport.getSelectedEquipment().get(position).getCompany());
+                        holder.hourspinner.setSelection(tem.indexOf(currentreport.
+                                getSelectedEquipment().get(position).getHours()));
+                    }
                     break;
                 case level1:
                     holder.itemView.setBackgroundColor(0);
-                    holder.textView1.setText(groups.get(position));
+                    holder.textView1.setText(grouparray.get(position));
                     break;
                 case level2:
                     holder.itemView.setBackgroundColor(0);
-                    holder.textView1.setText(manpower.get(categoryselected).get(position).getName());
-                    for(int j=0;j<currentreport.getSelectedWorkers().size();j++){
-                        if(manpower.get(categoryselected).get(position).getIdNumber().equals(
-                                currentreport.getSelectedWorkers().get(j).getIdNumber())){
-                            holder.itemView.setBackgroundColor(lightred);
+                    holder.textView1.setText(availableitemsarray.get(categoryselected).get(position).getName());
+                    if(itemstype.equals(manpower)) {
+                        for (int j = 0; j < currentreport.getSelectedWorkers().size(); j++) {
+                            if (availableitemsarray.get(categoryselected).get(position).getIdNumber().equals(
+                                    currentreport.getSelectedWorkers().get(j).getIdNumber())) {
+                                holder.itemView.setBackgroundColor(lightred);
+                            }
+                        }
+                    }else if(itemstype.equals(equipment)){
+                        for (int j = 0; j < currentreport.getSelectedEquipment().size(); j++) {
+                            if (availableitemsarray.get(categoryselected).get(position).getIdNumber().equals(
+                                    currentreport.getSelectedEquipment().get(j).getIdNumber())) {
+                                holder.itemView.setBackgroundColor(lightred);
+                            }
                         }
                     }
-                    holder.textView2.setText(manpower.get(categoryselected).get(position).getActivity());
-                    holder.textView3.setText(manpower.get(categoryselected).get(position).getCompany());
+                    holder.textView2.setText(availableitemsarray.get(categoryselected).get(position).getActivity());
+                    holder.textView3.setText(availableitemsarray.get(categoryselected).get(position).getCompany());
                     break;
             }
 
@@ -248,11 +292,15 @@ public class ManpowerFragment extends Fragment {
         public int getItemCount() {
             switch (level){
                 case level0:
-                    return currentreport.getSelectedWorkers().size();
+                    if(itemstype.equals(manpower)){
+                        return currentreport.getSelectedWorkers().size();
+                    }else if(itemstype.equals(equipment)){
+                        return currentreport.getSelectedEquipment().size();
+                    }
                 case level1:
-                    return groups.size();
+                    return grouparray.size();
                 case level2:
-                    return manpower.get(categoryselected).size();
+                    return availableitemsarray.get(categoryselected).size();
                 default:
                     return 0;
             }
@@ -262,14 +310,18 @@ public class ManpowerFragment extends Fragment {
         public boolean onItemMove(int fromPosition, int toPosition) {
             switch (level){
                 case level0:
-                    Collections.swap(currentreport.getSelectedWorkers(),fromPosition,toPosition);
+                    if(itemstype.equals(manpower)) {
+                        Collections.swap(currentreport.getSelectedWorkers(), fromPosition, toPosition);
+                    }else if(itemstype.equals(equipment)){
+                        Collections.swap(currentreport.getSelectedEquipment(),fromPosition,toPosition);
+                    }
                     break;
                 case level1:
-                    Collections.swap(groups,fromPosition,toPosition);
-                    Collections.swap(manpower,fromPosition,toPosition);
+                    Collections.swap(grouparray,fromPosition,toPosition);
+                    Collections.swap(availableitemsarray,fromPosition,toPosition);
                     break;
                 case level2:
-                    Collections.swap(manpower.get(categoryselected),fromPosition,toPosition);
+                    Collections.swap(availableitemsarray.get(categoryselected),fromPosition,toPosition);
                     break;
             }
             notifyItemMoved(fromPosition,toPosition);
@@ -280,57 +332,83 @@ public class ManpowerFragment extends Fragment {
         public void onItemDismiss(final int position) {
             switch (level){
                 case level0:
-                    final Worker_Object worker_object = currentreport.getSelectedWorkers().get(position);
-                    Snackbar snackbar = Snackbar
-                            .make(mrecyclerview_6, "ITEM REMOVED", Snackbar.LENGTH_LONG)
-                            .setAction("UNDO", new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    currentreport.getSelectedWorkers().add(position,worker_object);
-                                    notifyItemInserted(position);
-                                    mrecyclerview_6.scrollToPosition(position);
-                                }
-                            });
-                    snackbar.show();
-                    currentreport.getSelectedWorkers().remove(position);
-                    break;
+                    if(itemstype.equals(manpower)){
+                        final Worker_Object worker_object = currentreport.getSelectedWorkers().get(position);
+                        Snackbar snackbar = Snackbar
+                                .make(mrecyclerview_6, "ITEM REMOVED", Snackbar.LENGTH_LONG)
+                                .setAction("UNDO", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        currentreport.getSelectedWorkers().add(position,worker_object);
+                                        notifyItemInserted(position);
+                                        mrecyclerview_6.scrollToPosition(position);
+                                    }
+                                });
+                        snackbar.show();
+                        currentreport.getSelectedWorkers().remove(position);
+                        break;
+                    }else if(itemstype.equals(equipment)){
+                        final Worker_Object worker_object = currentreport.getSelectedEquipment().get(position);
+                        Snackbar snackbar = Snackbar
+                                .make(mrecyclerview_6, "ITEM REMOVED", Snackbar.LENGTH_LONG)
+                                .setAction("UNDO", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        currentreport.getSelectedEquipment().add(position,worker_object);
+                                        notifyItemInserted(position);
+                                        mrecyclerview_6.scrollToPosition(position);
+                                    }
+                                });
+                        snackbar.show();
+                        currentreport.getSelectedEquipment().remove(position);
+                        break;
+                    }
                 case level1:
-                    final String group2 = groups.get(position);
-                    final ArrayList<Worker_Object> listaworkers = manpower.get(position);
+                    final String group2 = grouparray.get(position);
+                    final ArrayList<Worker_Object> listaworkers = availableitemsarray.get(position);
                     Snackbar snackbar2 = Snackbar
                             .make(mrecyclerview_6, "ITEM REMOVED", Snackbar.LENGTH_LONG)
                             .setAction("UNDO", new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    groups.add(position,group2);
-                                    manpower.add(position,listaworkers);
+                                    grouparray.add(position,group2);
+                                    availableitemsarray.add(position,listaworkers);
                                     notifyItemInserted(position);
                                     mrecyclerview_6.scrollToPosition(position);
                                 }
                             });
                     snackbar2.show();
-                    groups.remove(position);
-                    manpower.remove(position);
-                    savedinfo.setWorkerGroups(groups);
-                    savedinfo.setListAvailableManpower(manpower);
+                    grouparray.remove(position);
+                    availableitemsarray.remove(position);
+                    if(itemstype.equals(manpower)){
+                        savedinfo.setWorkerGroups(grouparray);
+                        savedinfo.setListAvailableEquipment(availableitemsarray);
+                    }else if(itemstype.equals(equipment)){
+                        savedinfo.setEquipmentGroups(grouparray);
+                        savedinfo.setListAvailableEquipment(availableitemsarray);
+                    }
                     ((MainActivity)getActivity()).setSaved_info(savedinfo);
                     madapter_6.notifyDataSetChanged();
                     break;
                 case level2:
-                    final Worker_Object worker_object2 = manpower.get(categoryselected).get(position);
+                    final Worker_Object worker_object2 = availableitemsarray.get(categoryselected).get(position);
                     Snackbar snackbar3 = Snackbar
                             .make(mrecyclerview_6, "ITEM REMOVED", Snackbar.LENGTH_LONG)
                             .setAction("UNDO", new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    manpower.get(categoryselected).add(position,worker_object2);
+                                    availableitemsarray.get(categoryselected).add(position,worker_object2);
                                     notifyItemInserted(position);
                                     mrecyclerview_6.scrollToPosition(position);
                                 }
                             });
                     snackbar3.show();
-                    manpower.get(categoryselected).remove(position);
-                    savedinfo.setListAvailableManpower(manpower);
+                    availableitemsarray.get(categoryselected).remove(position);
+                    if(itemstype.equals(manpower)){
+                        savedinfo.setListAvailableManpower(availableitemsarray);
+                    }else if(itemstype.equals(equipment)){
+                        savedinfo.setListAvailableEquipment(availableitemsarray);
+                    }
                     ((MainActivity)getActivity()).setSaved_info(savedinfo);
                     madapter_6.notifyDataSetChanged();
                     break;
@@ -358,13 +436,16 @@ public class ManpowerFragment extends Fragment {
                     hourspinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                         @Override
                         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                            currentreport.getSelectedWorkers().get(getAdapterPosition()).setHours(
-                                    hourspinner.getSelectedItem().toString());
+                            if(itemstype.equals(manpower)) {
+                                currentreport.getSelectedWorkers().get(getAdapterPosition()).setHours(
+                                        hourspinner.getSelectedItem().toString());
+                            }else if(itemstype.equals(equipment)){
+                                currentreport.getSelectedEquipment().get(getAdapterPosition()).setHours(
+                                        hourspinner.getSelectedItem().toString());
+                            }
                         }
-
                         @Override
                         public void onNothingSelected(AdapterView<?> parent) {
-
                         }
                     });
                     break;
@@ -391,43 +472,77 @@ public class ManpowerFragment extends Fragment {
             if(v.getId()==itemView.getId()) {
                 switch (level) {
                     case level0:
-                        Worker_Object workera = currentreport.getSelectedWorkers().get(getAdapterPosition());
-                        showdialog2(workera,getAdapterPosition(),1);
+                        if(itemstype.equals(manpower)){
+                            Worker_Object workera = currentreport.getSelectedWorkers().get(getAdapterPosition());
+                            showdialog2(workera,getAdapterPosition(),1);
+                        }else if (itemstype.equals(equipment)){
+                            Worker_Object workera = currentreport.getSelectedEquipment().get(getAdapterPosition());
+                            showdialog2(workera,getAdapterPosition(),1);
+                        }
                         break;
                     case level1:
                         categoryselected = getAdapterPosition();
-                        if (manpower.size() <= categoryselected) {
-                            for (int i = manpower.size(); i <= categoryselected; i++) {
-                                manpower.add(new ArrayList<Worker_Object>());
+                        if (availableitemsarray.size() <= categoryselected) {
+                            for (int i = availableitemsarray.size(); i <= categoryselected; i++) {
+                                availableitemsarray.add(new ArrayList<Worker_Object>());
                             }
                         }
                         level = level2;
-                        titleview.setText(title3 + " > " + groups.get(categoryselected));
+                        if(itemstype.equals(manpower)) {
+                            titleview.setText(title3 + " > " + grouparray.get(categoryselected));
+                        }else if(itemstype.equals(equipment)){
+                            titleview.setText(title6 + " > " + grouparray.get(categoryselected));
+                        }
                         mrecyclerview_6.setAdapter(null);
                         mrecyclerview_6.setAdapter(madapter_6);
                         break;
                     case level2:
                         Boolean boo = true;
-                        Worker_Object worker2 = manpower.get(categoryselected).get(getAdapterPosition()).deepClone();
+                        Worker_Object worker2 = availableitemsarray.get(categoryselected)
+                                .get(getAdapterPosition()).deepClone();
                         for (int z = 0; z < currentreport.getSelectedWorkers().size(); z++) {
-                            if (manpower.get(categoryselected).get(getAdapterPosition()).getIdNumber().equals(
+                            if (availableitemsarray.get(categoryselected).get(getAdapterPosition()).getIdNumber().equals(
                                     currentreport.getSelectedWorkers().get(z).getIdNumber())) {
                                 boo = false;
                             }
                         }
-                        if (boo) {
-                            currentreport.getSelectedWorkers().add(worker2);
+                        if (boo) { //the worker is not included in the list
+                            if(itemstype.equals(manpower)){
+                                currentreport.getSelectedWorkers().add(worker2);
+                            }else if(itemstype.equals(equipment)){
+                                currentreport.getSelectedEquipment().add(worker2);
+                            }
                             itemView.setBackgroundColor(lightred);
-                        } else {
-                            currentreport.getSelectedWorkers().remove(
-                                    currentreport.getSelectedWorkers().indexOf(
-                                            manpower.get(categoryselected).get(getAdapterPosition())
-                                    ));
+                        } else { //the worker was already included in the list
+                            if(itemstype.equals(manpower)) {
+                                for (int i = 0; i < currentreport.getSelectedWorkers().size(); i++) {
+                                    if (currentreport.getSelectedWorkers().get(i).getIdNumber().equals(
+                                            availableitemsarray.get(categoryselected).get(getAdapterPosition()).getIdNumber())) {
+                                        currentreport.getSelectedWorkers().remove(i);
+                                    }
+                                }
+                            }else if(itemstype.equals(equipment)){
+                                for (int i = 0; i < currentreport.getSelectedEquipment().size(); i++) {
+                                    if (currentreport.getSelectedWorkers().get(i).getIdNumber().equals(
+                                            availableitemsarray.get(categoryselected).get(getAdapterPosition()).getIdNumber())) {
+                                        currentreport.getSelectedEquipment().remove(i);
+                                    }
+                                }
+                            }
+                            /*if(itemstype.equals(manpower)) {
+                                currentreport.getSelectedWorkers().remove(
+                                        currentreport.getSelectedWorkers().indexOf(
+                                                availableitemsarray.get(categoryselected).get(getAdapterPosition())));
+                            }else if (itemstype.equals(equipment)){
+                                currentreport.getSelectedEquipment().remove(
+                                        currentreport.getSelectedEquipment().indexOf(
+                                                availableitemsarray.get(categoryselected).get(getAdapterPosition())));
+                            }*/
                             itemView.setBackgroundColor(0);
                         }
                 }
             }else if(v.getId()==R.id.edit){
-                showdialog2(manpower.get(categoryselected).get(getAdapterPosition()),
+                showdialog2(availableitemsarray.get(categoryselected).get(getAdapterPosition()),
                         getAdapterPosition(),0);
             }
         }
@@ -532,14 +647,18 @@ public class ManpowerFragment extends Fragment {
             public void onClick(View v) {
                 if(!editText.getText().toString().equals("")){
                     if(level.equals(level1)){
-                        groups.add(editText.getText().toString());
-                        manpower.add(new ArrayList<Worker_Object>());
-                        savedinfo.setWorkerGroups(groups);
+                        grouparray.add(editText.getText().toString());
+                        availableitemsarray.add(new ArrayList<Worker_Object>());
+                        if(itemstype.equals(manpower)) {
+                            savedinfo.setWorkerGroups(grouparray);
+                        }else if(itemstype.equals(equipment)){
+                            savedinfo.setEquipmentGroups(grouparray);
+                        }
                         madapter_6.notifyDataSetChanged();
                     }else {
                         Worker_Object worker = new Worker_Object();
                         worker.setName(editText.getText().toString());
-                        manpower.get(categoryselected).add(worker);
+                        availableitemsarray.get(categoryselected).add(worker);
                         madapter_6.notifyDataSetChanged();
                     }
                 }
@@ -651,17 +770,32 @@ public class ManpowerFragment extends Fragment {
                 worker2.setActivity(spinnerA.getSelectedItem().toString());
                 worker2.setCompany(spinnerB.getSelectedItem().toString());
                 worker2.setHours("8");
-                if(position==-1 && caso ==0){
-                    manpower.get(categoryselected).add(worker2);}
-                else if(position!=-1 && caso==1){
-                    currentreport.getSelectedWorkers().set(position,worker);
-                }else{
-                    for(int i=0;i<currentreport.getSelectedWorkers().size();i++){
-                        if(currentreport.getSelectedWorkers().get(i).getIdNumber().equals(worker.getIdNumber())){
-                            currentreport.getSelectedWorkers().set(i,worker);
+                if(position==-1 && caso ==0){//añadir nuevo
+                    //si position = -1 estamos anadiendo un nuevo trabajador
+                    availableitemsarray.get(categoryselected).add(worker2);}
+                else if(position!=-1 && caso==1){//editar de la lista de selected
+                    //si position es diferente de -1 estamos editando uno de la lista y caso = 1
+                    //hemos selectionado uno de selected reports
+                    if(itemstype.equals(manpower)){
+                        currentreport.getSelectedWorkers().set(position,worker);
+                    }else if (itemstype.equals(equipment)){
+                        currentreport.getSelectedEquipment().set(position,worker);
+                    }
+                }else{ //editar de la la lista de available
+                    if(itemstype.equals(manpower)) {
+                        for (int i = 0; i < currentreport.getSelectedWorkers().size(); i++) {
+                            if (currentreport.getSelectedWorkers().get(i).getIdNumber().equals(worker.getIdNumber())) {
+                                currentreport.getSelectedWorkers().set(i, worker);
+                            }
+                        }
+                    }else if (itemstype.equals(equipment)){
+                        for (int i = 0; i < currentreport.getSelectedWorkers().size(); i++) {
+                            if (currentreport.getSelectedEquipment().get(i).getIdNumber().equals(worker.getIdNumber())) {
+                                currentreport.getSelectedEquipment().set(i, worker);
+                            }
                         }
                     }
-                    manpower.get(categoryselected).set(position,worker2);
+                    availableitemsarray.get(categoryselected).set(position,worker2);
                 }
                 madapter_6.notifyDataSetChanged();
                 dialog.dismiss();

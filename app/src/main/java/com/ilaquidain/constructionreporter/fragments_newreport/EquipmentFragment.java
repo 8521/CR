@@ -404,7 +404,7 @@ public class EquipmentFragment extends Fragment {
                         break;
                     case level2:
                         Boolean boo = true;
-                        Worker_Object worker2 = equipment.get(categoryselected).get(getAdapterPosition());
+                        Worker_Object worker2 = equipment.get(categoryselected).get(getAdapterPosition()).deepClone();
                         for (int z = 0; z < currentreport.getSelectedEquipment().size(); z++) {
                             if (equipment.get(categoryselected).get(getAdapterPosition()).getIdNumber().equals(
                                     currentreport.getSelectedEquipment().get(z).getIdNumber())) {
@@ -650,11 +650,11 @@ public class EquipmentFragment extends Fragment {
                 if(position==-1 && caso ==0){
                     equipment.get(categoryselected).add(worker2);}
                 else if(position!=-1 && caso==1){
-                    currentreport.getSelectedWorkers().set(position,worker);
+                    currentreport.getSelectedEquipment().set(position,worker);
                 }else{
-                    for(int i=0;i<currentreport.getSelectedWorkers().size();i++){
-                        if(currentreport.getSelectedWorkers().get(i).getIdNumber().equals(worker.getIdNumber())){
-                            currentreport.getSelectedWorkers().set(i,worker);
+                    for(int i=0;i<currentreport.getSelectedEquipment().size();i++){
+                        if(currentreport.getSelectedEquipment().get(i).getIdNumber().equals(worker.getIdNumber())){
+                            currentreport.getSelectedEquipment().set(i,worker);
                         }
                     }
                     equipment.get(categoryselected).set(position,worker2);

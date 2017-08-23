@@ -26,6 +26,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputType;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
@@ -100,12 +101,21 @@ public class Settings_Fragment extends Fragment {
         meditor = msharedpreferences.edit();
 
         originatorname = (EditText)v.findViewById(R.id.settingoption1_1);
+        originatorname.setInputType(InputType.TYPE_CLASS_TEXT |
+                InputType.TYPE_TEXT_FLAG_CAP_SENTENCES |
+                InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         String s1 = msharedpreferences.getString(OriginatorName,null);
         if(s1!=null){originatorname.setText(s1);}
         originatorpositoin = (EditText)v.findViewById(R.id.settingoption2_1);
+        originatorpositoin.setInputType(InputType.TYPE_CLASS_TEXT |
+                InputType.TYPE_TEXT_FLAG_CAP_SENTENCES |
+                InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         String s2 = msharedpreferences.getString(OriginatorPosition,null);
         if(s2!=null){originatorpositoin.setText(s2);}
         originatorcompany = (EditText)v.findViewById(R.id.settingoption3_1);
+        originatorcompany.setInputType(InputType.TYPE_CLASS_TEXT |
+                InputType.TYPE_TEXT_FLAG_CAP_SENTENCES |
+                InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         String s3 = msharedpreferences.getString(OriginatorCompany,null);
         if(s3!=null){originatorcompany.setText(s3);}
         includemanpower = (Switch)v.findViewById(R.id.switch1);
@@ -334,8 +344,28 @@ public class Settings_Fragment extends Fragment {
     }
 
     private String getImagePathFromUri(Uri Uri1){
-
-        String pathfromuri = "";
+        String pathfromuri = null;
+        if(Uri1 == null){return null;}
+        try {
+            String WholeID = DocumentsContract.getDocumentId(Uri1);
+            String id = WholeID.split(":")[1];
+            String[] column = {MediaStore.Images.Media.DATA};
+            String sel = MediaStore.Images.Media._ID+"=?";
+            Cursor cursor = getActivity().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    column, sel, new String[]{ id }, null);
+            int columnIndex = cursor.getColumnIndex(column[0]);
+            if (cursor.moveToFirst()) {pathfromuri = cursor.getString(columnIndex);}
+            cursor.close();
+        }catch (Exception e){
+            String[] filePathColumn = { MediaStore.Images.Media.DATA };
+            Cursor cursor = getActivity().getContentResolver().query(Uri1, filePathColumn, null, null, null);
+            cursor.moveToFirst();
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            pathfromuri = cursor.getString(columnIndex);
+            cursor.close();
+        }
+        return pathfromuri;
+        /*String pathfromuri = "";
         if(Build.VERSION.SDK_INT>=19){
             String WholeID = DocumentsContract.getDocumentId(Uri1);
             String id = WholeID.split(":")[1];
@@ -365,7 +395,7 @@ public class Settings_Fragment extends Fragment {
                 pathfromuri = cursor.getString(column_index);
             }
             return pathfromuri;
-        }
+        }*/
     }
     public class signature extends View {
 

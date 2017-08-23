@@ -21,6 +21,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -83,8 +84,17 @@ public class NewProjectFragment extends Fragment implements View.OnClickListener
 
         projectid = currentproject.getProjectId();
         projectname = (EditText)v.findViewById(R.id.df_projectinfo_3);
+        projectname.setInputType(InputType.TYPE_CLASS_TEXT |
+                InputType.TYPE_TEXT_FLAG_CAP_SENTENCES |
+                InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         projectrefno = (EditText) v.findViewById(R.id.df_projectinfo_6);
+        projectname.setInputType(InputType.TYPE_CLASS_TEXT |
+                InputType.TYPE_TEXT_FLAG_CAP_SENTENCES |
+                InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         projectaddress = (EditText) v.findViewById(R.id.df_projectinfo_9);
+        projectaddress.setInputType(InputType.TYPE_CLASS_TEXT |
+                InputType.TYPE_TEXT_FLAG_CAP_SENTENCES |
+                InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         projectname.setText(currentproject.getProjectName());
         projectrefno.setText(currentproject.getProjectRefNo());
         projectaddress.setText(currentproject.getProjectAddress());
@@ -163,7 +173,28 @@ public class NewProjectFragment extends Fragment implements View.OnClickListener
 
     private String getImagePathFromUri(Uri Uri1){
 
-        String pathfromuri = "";
+        String pathfromuri = null;
+        if(Uri1 == null){return null;}
+        try {
+            String WholeID = DocumentsContract.getDocumentId(Uri1);
+            String id = WholeID.split(":")[1];
+            String[] column = {MediaStore.Images.Media.DATA};
+            String sel = MediaStore.Images.Media._ID+"=?";
+            Cursor cursor = getActivity().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    column, sel, new String[]{ id }, null);
+            int columnIndex = cursor.getColumnIndex(column[0]);
+            if (cursor.moveToFirst()) {pathfromuri = cursor.getString(columnIndex);}
+            cursor.close();
+        }catch (Exception e){
+            String[] filePathColumn = { MediaStore.Images.Media.DATA };
+            Cursor cursor = getActivity().getContentResolver().query(Uri1, filePathColumn, null, null, null);
+            cursor.moveToFirst();
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            pathfromuri = cursor.getString(columnIndex);
+            cursor.close();
+        }
+        return pathfromuri;
+        /*String pathfromuri = "";
         if(Build.VERSION.SDK_INT>=19){
             String WholeID = DocumentsContract.getDocumentId(Uri1);
             String id = WholeID.split(":")[1];
@@ -193,7 +224,7 @@ public class NewProjectFragment extends Fragment implements View.OnClickListener
                 pathfromuri = cursor.getString(column_index);
             }
             return pathfromuri;
-        }
+        }*/
     }
     private void SetUpBitMapOptions() {
         bmOptions = new BitmapFactory.Options();

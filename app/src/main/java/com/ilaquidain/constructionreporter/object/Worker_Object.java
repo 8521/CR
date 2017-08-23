@@ -3,6 +3,11 @@ package com.ilaquidain.constructionreporter.object;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -32,6 +37,21 @@ public class Worker_Object implements Parcelable, Serializable {
 
     public void setActivity(String s5){Activity = s5;}
     public String getActivity(){return Activity;}
+
+    public Worker_Object deepClone() {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(this);
+            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            return (Worker_Object) ois.readObject();
+        } catch (IOException e) {
+            return null;
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
+    }
 
     public Worker_Object(){
         IdNumber = UUID.randomUUID().toString();
