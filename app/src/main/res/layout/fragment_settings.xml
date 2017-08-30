@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
+    android:id="@+id/linearlayout_framentsettings"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:background="@color/settings_gray"
@@ -208,6 +209,41 @@
                     android:layout_below="@id/editcompanylogo"
                     android:layout_marginTop="@dimen/dp5"
                     android:background="@color/white" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/dp5"
+                android:paddingTop="@dimen/dp5">
+                <TextView
+                    android:id="@+id/settingoptionconstructiondate"
+                    style="@style/textstyle_B"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:padding="@dimen/dp5"
+                    android:text="@string/IncludeConstructionDateInReport"
+                    android:textColor="@color/white" />
+                <Switch
+                    android:id="@+id/switch_constructiondate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="@dimen/dp10"
+                    android:checked="true"
+                    android:switchMinWidth="50dp"
+                    android:thumb="@drawable/switch_thumb_selector"
+                    android:track="@drawable/switch_track_selector" />
+                <View
+                    android:layout_width="wrap_content"
+                    android:layout_height="1dp"
+                    android:layout_below="@id/settingoptionconstructiondate"
+                    android:layout_marginTop="@dimen/dp5"
+                    android:background="@color/white" />
+
+
             </RelativeLayout>
 
             <RelativeLayout

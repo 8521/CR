@@ -60,8 +60,13 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -86,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
     private final static String OriginatorName = "OriginatorName";
     private final static String OriginatorPosition = "OriginatorPosition";
     private final static String OriginatorCompany = "OrignatorCompany";
+    private final static String IncludeConstructionDate = "IncludeConstructionDate";
     private final static String IncludeManpower = "IncludeManpower";
     private final static String IncludeEquipment = "IncludeEquipment";
     private final static String IncludePhotos = "IncludePhotos";
@@ -256,10 +262,10 @@ public class MainActivity extends AppCompatActivity {
     }*/
     /*private void CreateSampleReport() {
         Project_Object sampleproject = new Project_Object();
-        sampleproject.setProjectName("Sample Project");
-        sampleproject.setProjectId(UUID.randomUUID().toString());
-        sampleproject.setProjectRefNo("Bridge No.: 0001");
-        sampleproject.setProjectAddress("500 ABC Street, Los Angeles, California");
+        sampleproject.setContractor_name("Sample Project");
+        sampleproject.setContractor_id(UUID.randomUUID().toString());
+        sampleproject.setContractor_address("Bridge No.: 0001");
+        sampleproject.setContractor_ref_no("500 ABC Street, Los Angeles, California");
 
         editor.putString(OriginatorName,"John Smith");
         editor.putString(OriginatorPosition,"Field Engineer");
@@ -379,7 +385,7 @@ public class MainActivity extends AppCompatActivity {
             Log.v("log_tag", e.toString());
         }
         Bitmap projectlogo = BitmapFactory.decodeResource(getResources(),R.drawable.ggi);
-        String StoredPathLogo3 = sampleproject.getProjectId()+".jpg";
+        String StoredPathLogo3 = sampleproject.getContractor_id()+".jpg";
         try {
             File f = new File(this.getApplicationContext().getFilesDir(),StoredPathLogo3);
             FileOutputStream fos = new FileOutputStream(f);
@@ -821,7 +827,12 @@ public class MainActivity extends AppCompatActivity {
             per.setPaddingBottom(2);
             table.addCell(per);
             //Row 4 column 3
-            tempstring = "";
+            Boolean b4 = msharedpreferences.getBoolean(IncludeConstructionDate,true);
+            if(b4){
+                tempstring = "Report No.";
+            }else {
+                tempstring = "";
+            }
             par = new Paragraph(tempstring,Cal9);
             per = new PdfPCell(par);
             per.setPaddingLeft(5);
@@ -830,7 +841,12 @@ public class MainActivity extends AppCompatActivity {
             per.setBackgroundColor(lightgray);
             table.addCell(per);
             //Row 4 column 4
-            tempstring = "";
+            if(b4){
+                tempstring = getConstructionDate(mcurrentreport.getReportInfo().get(8));
+                tempstring = "46 - "+tempstring;
+            }else {
+                tempstring = "";
+            }
             par = new Paragraph(tempstring,Cal9);
             per = new PdfPCell(par);
             per.setPaddingLeft(5);
@@ -864,6 +880,53 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+    private String getConstructionDate(String s) {
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy");
+        ArrayList<Integer> holidays = new ArrayList<>();
+        Date reportdate = new Date();
+        Date referencedate = new Date();
+        try{
+            reportdate = sdf.parse(s);
+            referencedate = sdf.parse("08/01/17");
+        }catch (ParseException e){
+            e.printStackTrace();
+        }
+        long dif1 = reportdate.getTime()-referencedate.getTime();
+        long dif2 = TimeUnit.MILLISECONDS.toDays(dif1);
+        int originatconsdate = 88;
+        Calendar c = Calendar.getInstance();
+        c.setTime(referencedate);
+        for(int i=0;i<dif2;i++){
+            c.add(Calendar.DATE,1);
+            Date tempdate = c.getTime();
+            if(c.get(Calendar.DAY_OF_WEEK)!=Calendar.SATURDAY && c.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY &&
+                    !sdf.format(tempdate).equals("09/04/17") && !sdf.format(tempdate).equals("10/09/17") &&
+                    !sdf.format(tempdate).equals("11/10/17")){
+                originatconsdate = originatconsdate +1;
+                holidays.add(0);
+            }else{
+                holidays.add(1);
+            }
+        }
+        String returnvalue;
+        c.setTime(reportdate);
+        if(holidays.get(holidays.size()-1)==1 && holidays.get(holidays.size()-2)==1&&
+                holidays.get(holidays.size()-3)==1&&holidays.get(holidays.size()-4)==1){
+            returnvalue = String.valueOf(originatconsdate)+"D";
+        }else if(holidays.get(holidays.size()-1)==1 && holidays.get(holidays.size()-2)==1&&
+                holidays.get(holidays.size()-3)==1){
+            returnvalue = String.valueOf(originatconsdate)+"C";
+        }else if(holidays.get(holidays.size()-1)==1 && holidays.get(holidays.size()-2)==1){
+            returnvalue = String.valueOf(originatconsdate)+"B";
+        }else if(holidays.get(holidays.size()-1)==1){
+            returnvalue = String.valueOf(originatconsdate)+"A";
+        }else{
+            returnvalue = String.valueOf(originatconsdate);
+        }
+        return returnvalue;
+    }
+
     private void CreateManPowerPage(){
         doc.newPage();
 

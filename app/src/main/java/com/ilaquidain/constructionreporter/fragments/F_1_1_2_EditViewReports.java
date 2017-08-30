@@ -1,6 +1,5 @@
 package com.ilaquidain.constructionreporter.fragments;
 
-import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
@@ -8,22 +7,19 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
-import android.icu.util.ULocale;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ContextThemeWrapper;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,8 +28,6 @@ import com.ilaquidain.constructionreporter.activities.MainActivity;
 import com.ilaquidain.constructionreporter.object.Project_Object;
 import com.ilaquidain.constructionreporter.object.Report_Object;
 import com.ilaquidain.constructionreporter.object.Saved_Info_Object;
-import com.ilaquidain.constructionreporter.object.Task_Object;
-import com.ilaquidain.constructionreporter.object.Worker_Object;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -57,7 +51,7 @@ public class F_1_1_2_EditViewReports extends Fragment {
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_editreports,container,false);
-
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Select Report");
         //((AppCompatActivity)getActivity()).getSupportActionBar().hide();
 
         mpref = getActivity().getPreferences(Context.MODE_PRIVATE);
@@ -102,7 +96,7 @@ public class F_1_1_2_EditViewReports extends Fragment {
 
         @Override
         public viewholder_edit_reports onCreateViewHolder(ViewGroup parent, int viewType) {
-            View v2 = LayoutInflater.from(parent.getContext()).inflate(R.layout.cardview_pdfreport,
+            View v2 = LayoutInflater.from(parent.getContext()).inflate(R.layout.cardview_editreport,
                     parent,false);
             return new viewholder_edit_reports(v2);
         }
@@ -152,66 +146,72 @@ public class F_1_1_2_EditViewReports extends Fragment {
         }
     }
     private class viewholder_edit_reports extends RecyclerView.ViewHolder implements
-            HelperViewHolder31, View.OnClickListener, View.OnLongClickListener{
+            HelperViewHolder31, View.OnClickListener {
         final TextView textView1;
-        final TextView textView2;
+        ImageButton duplicatereport;
+        //final TextView textView2;
 
         public viewholder_edit_reports(View itemView) {
             super(itemView);
             textView1 = (TextView)itemView.findViewById(R.id.text1);
-            textView2 = (TextView)itemView.findViewById(R.id.text2);
-            itemView.setOnClickListener(this);
-            itemView.setOnLongClickListener(this);
+            duplicatereport = (ImageButton) itemView.findViewById(R.id.duplicatereport);
+            //textView2 = (TextView)itemView.findViewById(R.id.cardview_text2);
+            textView1.setOnClickListener(this);
+            duplicatereport.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
-            FragmentManager fm = getFragmentManager();
-            F_1_1_1_NewReport fgmt = new F_1_1_1_NewReport();
-            mpref = getActivity().getPreferences(Context.MODE_PRIVATE);
-            mprefedit = mpref.edit();
-            mprefedit.putInt("reportnumber",getAdapterPosition());
-            mprefedit.apply();
-            fm.beginTransaction()
-                    .add(R.id.MainFrame,fgmt,getResources().getString(R.string.fragment_editreport))
-                    .addToBackStack(getResources().getString(R.string.fragment_editreport))
-                    .commit();
-        }
+            switch (v.getId()){
+                case R.id.text1:
+                    FragmentManager fm = getFragmentManager();
+                    F_1_1_1_NewReport fgmt = new F_1_1_1_NewReport();
+                    mpref = getActivity().getPreferences(Context.MODE_PRIVATE);
+                    mprefedit = mpref.edit();
+                    mprefedit.putInt("reportnumber",getAdapterPosition());
+                    mprefedit.apply();
+                    fm.beginTransaction()
+                            .add(R.id.MainFrame,fgmt,getResources().getString(R.string.fragment_editreport))
+                            .addToBackStack(getResources().getString(R.string.fragment_editreport))
+                            .commit();
+                    break;
+                case R.id.duplicatereport:
+                    AlertDialog.Builder buider = new AlertDialog.Builder(getActivity());
+                    buider.setMessage("Do you want to duplicate the report?");
+                    buider.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Report_Object duplicated_report;
+                            try{
+                                duplicated_report = currentproject.getProjectReports().get(getAdapterPosition()).deepClone();
+                                String currentdate = new SimpleDateFormat("MM/dd/yy",Locale.US).format(new Date());
+                                duplicated_report.getReportInfo().set(8,currentdate);
+                                String id = UUID.randomUUID().toString();
+                                duplicated_report.setReportId(id);
+                                savedreports.add(duplicated_report);
+                                currentproject.setProjectReports(savedreports);
+                                savedinfo.getSavedProjects().set(projectnumber,currentproject);
+                                ((MainActivity)getActivity()).setSaved_info(savedinfo);
+                                madapter.notifyDataSetChanged();
+                            }
+                            catch (Exception e){
+                                e.printStackTrace();
+                                Snackbar.make(getActivity().getWindow().getDecorView().getRootView().
+                                                findViewById(R.id.linearlayout_fragmenteditreports),
+                                        "Error Duplicating Report",Snackbar.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                    buider.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
 
-        @Override
-        public boolean onLongClick(View v) {
-            AlertDialog.Builder buider = new AlertDialog.Builder(getActivity());
-            buider.setMessage("Do you want to duplicate the report?");
-            buider.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    Report_Object duplicated_report;
-                    try{
-                        duplicated_report = currentproject.getProjectReports().get(getAdapterPosition()).deepClone();
-                        String currentdate = new SimpleDateFormat("MM/dd/yy",Locale.US).format(new Date());
-                        duplicated_report.getReportInfo().set(8,currentdate);
-                        String id = UUID.randomUUID().toString();
-                        duplicated_report.setReportId(id);
-                        savedreports.add(duplicated_report);
-                        currentproject.setProjectReports(savedreports);
-                        savedinfo.getSavedProjects().set(projectnumber,currentproject);
-                        ((MainActivity)getActivity()).setSaved_info(savedinfo);
-                        madapter.notifyDataSetChanged();
-                    }
-                    catch (Exception e){
-                        e.printStackTrace();
-                        Toast.makeText(getActivity(),"Not possible to duplicate",Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
-            buider.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
+                        }
+                    });
+                    buider.show();
+                    break;
+            }
 
-                }
-            });
-            buider.show();
-            return false;
         }
 
         @Override

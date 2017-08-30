@@ -10,29 +10,29 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Gravity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
 import com.ilaquidain.constructionreporter.R;
 import com.ilaquidain.constructionreporter.activities.MainActivity;
-import com.ilaquidain.constructionreporter.fragments_newreport.EquipmentFragment;
 import com.ilaquidain.constructionreporter.fragments_newreport.ManEquipFragment;
 import com.ilaquidain.constructionreporter.fragments_newreport.Photos_Fragment;
 import com.ilaquidain.constructionreporter.fragments_newreport.ReportInfoFragment;
 import com.ilaquidain.constructionreporter.fragments_newreport.ReportTasksFragment;
-import com.ilaquidain.constructionreporter.fragments_newreport.ManpowerFragment;
-import com.ilaquidain.constructionreporter.object.Image_Object;
 import com.ilaquidain.constructionreporter.object.Project_Object;
 import com.ilaquidain.constructionreporter.object.Report_Object;
 import com.ilaquidain.constructionreporter.object.Saved_Info_Object;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+
 
 public class F_1_1_1_NewReport extends Fragment implements View.OnClickListener{
 
@@ -48,14 +48,20 @@ public class F_1_1_1_NewReport extends Fragment implements View.OnClickListener{
     private SharedPreferences mpref;
     private SharedPreferences.Editor mprefedit;
     private View v;
+    private InterstitialAd mInterstitialAd;
 
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.fragment_newreport,container,false);
-
         v.findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+
+        mInterstitialAd = new InterstitialAd(getActivity());
+        mInterstitialAd.setAdUnitId("ca-app-pub-9978137837326968/9780327651");
+        mInterstitialAd.loadAd(new AdRequest.Builder()
+                .addTestDevice("BED5CEE69ABEED9A21B0D1A4819302F8")
+                .build());
 
         //((AppCompatActivity)getActivity()).getSupportActionBar().hide();
 
@@ -73,8 +79,11 @@ public class F_1_1_1_NewReport extends Fragment implements View.OnClickListener{
             int newreport = mpref.getInt("newreport",1);
             if(newreport == 1){
                 currentreport = new Report_Object();
+                ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("New Report");
             }else {
                 currentreport = savedinfo.getTempreport();
+                String s1 = currentreport.getReportInfo().get(8)+" Report";
+                ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(s1);
             }
             savedinfo.setTempreport(currentreport);
             mprefedit = mpref.edit();
@@ -83,6 +92,8 @@ public class F_1_1_1_NewReport extends Fragment implements View.OnClickListener{
             ((MainActivity)getActivity()).setSaved_info(savedinfo);
         }else {
             currentreport = savedinfo.getSavedProjects().get(projectnumber).getProjectReports().get(reportnumber);
+            String s1 = currentreport.getReportInfo().get(8)+" Report";
+            ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(s1);
         }
 
         TextView title = (TextView)v.findViewById(R.id.newreport_title);
@@ -200,7 +211,29 @@ public class F_1_1_1_NewReport extends Fragment implements View.OnClickListener{
                 ExitFragment(0);
                 break;
             case R.id.fabpdf:
-                ExitFragment(1);
+                if (mInterstitialAd.isLoaded()) {
+                    mInterstitialAd.show();
+                } else {
+                    Log.d("TAG", "The interstitial wasn't loaded yet.");
+                }
+                mInterstitialAd.setAdListener(new AdListener(){
+                    @Override
+                    public void onAdFailedToLoad(int i) {
+                        super.onAdFailedToLoad(i);
+                        ExitFragment(1);
+                    }
+                    @Override
+                    public void onAdClosed() {
+                        super.onAdClosed();
+                        ExitFragment(1);
+                    }
+
+                    @Override
+                    public void onAdLeftApplication() {
+                        super.onAdLeftApplication();
+                        ExitFragment(1);
+                    }
+                });
                 break;
         }
     }

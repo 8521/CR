@@ -24,6 +24,9 @@ import com.ilaquidain.constructionreporter.object.SquareImageView;
 import java.io.File;
 import java.io.FileInputStream;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+
 public class F_1_1_ProjectMenu extends Fragment implements View.OnClickListener {
 
     private FragmentManager fm;
@@ -32,6 +35,7 @@ public class F_1_1_ProjectMenu extends Fragment implements View.OnClickListener 
     private SharedPreferences mpref;
     private SharedPreferences.Editor mprefedit;
     private Integer projectnumber;
+    private AdView mAdView;
 
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,7 +45,8 @@ public class F_1_1_ProjectMenu extends Fragment implements View.OnClickListener 
         projectnumber = mpref.getInt("projectnumber",-1);
 
         if(savedinfo!=null && projectnumber !=-1){
-            currentproject = savedinfo.getSavedProjects().get(projectnumber);}
+            currentproject = savedinfo.getSavedProjects().get(projectnumber);
+        }
         else{
             if ( getFragmentManager().getBackStackEntryCount() > 0)
             {getFragmentManager().popBackStack();}
@@ -58,6 +63,20 @@ public class F_1_1_ProjectMenu extends Fragment implements View.OnClickListener 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_main,container,false);
+
+        mAdView = (AdView) v.findViewById(R.id.add_banner_1);
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice("BED5CEE69ABEED9A21B0D1A4819302F8")
+                .build();
+        mAdView.loadAd(adRequest);
+
+        try{
+            ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Project Menu");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+
 
         //((AppCompatActivity)getActivity()).getSupportActionBar().show();
 

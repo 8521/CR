@@ -12,8 +12,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.NotificationCompat;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -47,7 +45,7 @@ public class F_1_1_3_ViewPdfs extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_recyclerview,container,false);
-
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Select Report");
         //((AppCompatActivity)getActivity()).getSupportActionBar().hide();
 
         savedinfo = ((MainActivity)getActivity()).getSaved_info();
@@ -152,11 +150,11 @@ public class F_1_1_3_ViewPdfs extends Fragment{
     }
     private class ViewHolderPDFS extends RecyclerView.ViewHolder implements View.OnClickListener{
         final TextView textview1;
-        final TextView textview2;
+        //final TextView textview2;
         public ViewHolderPDFS(View itemView) {
             super(itemView);
             textview1 = (TextView)itemView.findViewById(R.id.text1);
-            textview2 = (TextView)itemView.findViewById(R.id.text2);
+            //textview2 = (TextView)itemView.findViewById(R.id.cardview_text2);
             itemView.setOnClickListener(this);
         }
 

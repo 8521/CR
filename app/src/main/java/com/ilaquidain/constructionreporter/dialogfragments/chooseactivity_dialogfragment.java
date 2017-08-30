@@ -106,9 +106,6 @@ public class chooseactivity_dialogfragment extends DialogFragment implements Vie
         }
 
         lightred = ContextCompat.getColor(getActivity(),R.color.selection_light_orange);
-        //Saved_Info_Object  savedInfo = ((MainActivity)getActivity()).getSaved_info();
-        //currentreport = (Report_Object)getArguments().getSerializable("currentreport");
-        //getArguments().remove("currentreport");
 
         if(savedinfo.getListasOpciones().get(9)!=null){
             AvailableTasks = new ArrayList<>(savedinfo.getListasOpciones().get(9));}

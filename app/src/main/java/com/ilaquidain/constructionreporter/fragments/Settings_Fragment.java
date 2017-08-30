@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -63,6 +64,7 @@ public class Settings_Fragment extends Fragment {
 
     private final static String OriginatorName = "OriginatorName";
     private final static String OriginatorPosition = "OriginatorPosition";
+    private final static String IncludeConstructionDate = "IncludeConstructionDate";
     private final static String OriginatorCompany = "OrignatorCompany";
     private final static String IncludeManpower = "IncludeManpower";
     private final static String IncludeEquipment = "IncludeEquipment";
@@ -72,6 +74,7 @@ public class Settings_Fragment extends Fragment {
     private EditText originatorname;
     private EditText originatorpositoin;
     private EditText originatorcompany;
+    private Switch includeconstructiondate;
     private Switch includemanpower;
     private Switch includeequipment;
     private Switch includephotos;
@@ -127,6 +130,9 @@ public class Settings_Fragment extends Fragment {
         includephotos = (Switch)v.findViewById(R.id.switch3);
         Boolean b3 = msharedpreferences.getBoolean(IncludePhotos,true);
         includephotos.setChecked(b3);
+        includeconstructiondate = (Switch)v.findViewById(R.id.switch_constructiondate);
+        Boolean b4 = msharedpreferences.getBoolean(IncludeConstructionDate,true);
+        includeconstructiondate.setChecked(b4);
         photosquality = (Spinner)v.findViewById(R.id.photoqualityspinner);
         String s4 = msharedpreferences.getString(PhotosQuality,"Medium");
         List<String> array = Arrays.asList(getResources().getStringArray(R.array.photoquality));
@@ -142,12 +148,15 @@ public class Settings_Fragment extends Fragment {
                 meditor.putBoolean(IncludeManpower,includemanpower.isChecked());
                 meditor.putBoolean(IncludeEquipment,includeequipment.isChecked());
                 meditor.putBoolean(IncludePhotos,includephotos.isChecked());
+                meditor.putBoolean(IncludeConstructionDate,includeconstructiondate.isChecked());
                 meditor.putString(PhotosQuality,photosquality.getSelectedItem().toString());
                 meditor.apply();
 
-                Toast toast = Toast.makeText(getActivity(),"Changes Saved Succesfully",Toast.LENGTH_SHORT);
+                Snackbar.make(getActivity().getWindow().getDecorView().getRootView().findViewById(R.id.linearlayout_framentsettings),
+                        "Changes Saved Succesfully",Snackbar.LENGTH_SHORT).show();
+                /*Toast toast = Toast.makeText(getActivity(),"Changes Saved Succesfully",Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.CENTER,0,0);
-                toast.show();
+                toast.show();*/
                 if ( getFragmentManager().getBackStackEntryCount() > 0)
                 {getFragmentManager().popBackStack();}
             }
@@ -316,8 +325,6 @@ public class Settings_Fragment extends Fragment {
                 dialog2.show();
             }
         });
-
-
 
         return v;
     }

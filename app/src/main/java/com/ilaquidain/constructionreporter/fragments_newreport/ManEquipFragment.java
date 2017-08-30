@@ -19,6 +19,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -80,6 +81,8 @@ public class ManEquipFragment extends Fragment {
     private SharedPreferences mpref;
     private SharedPreferences.Editor mprefedit;
 
+    private InputMethodManager imm;
+
     private void ExitMethod() {
         if(reportnumber==-1){
             savedinfo.setTempreport(currentreport);
@@ -101,7 +104,6 @@ public class ManEquipFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, final Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.dialogfragment_manpower,container,false);
         level = level0;
-
 
         lightred = ContextCompat.getColor(getActivity(),R.color.selection_light_orange);
 
@@ -171,7 +173,8 @@ public class ManEquipFragment extends Fragment {
                         break;
                     case level1:
                         level = level0;
-                        titleview.setText(title1);
+                        if(itemstype.equals(manpower)){titleview.setText(title1);}
+                        else if(itemstype.equals(equipment)){titleview.setText(title4);}
                         mrecyclerview_6.setAdapter(null);
                         mrecyclerview_6.setAdapter(madapter_6);
                         break;
@@ -196,6 +199,9 @@ public class ManEquipFragment extends Fragment {
         ItemTouchHelper.Callback callback_6 = new Callback_5(madapter_6);
         mhelper_6 = new ItemTouchHelper(callback_6);
         mhelper_6.attachToRecyclerView(mrecyclerview_6);
+
+        imm = (InputMethodManager) getActivity()
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
 
         return v;
     }
@@ -382,7 +388,7 @@ public class ManEquipFragment extends Fragment {
                     availableitemsarray.remove(position);
                     if(itemstype.equals(manpower)){
                         savedinfo.setWorkerGroups(grouparray);
-                        savedinfo.setListAvailableEquipment(availableitemsarray);
+                        savedinfo.setListAvailableManpower(availableitemsarray);
                     }else if(itemstype.equals(equipment)){
                         savedinfo.setEquipmentGroups(grouparray);
                         savedinfo.setListAvailableEquipment(availableitemsarray);
@@ -500,10 +506,19 @@ public class ManEquipFragment extends Fragment {
                         Boolean boo = true;
                         Worker_Object worker2 = availableitemsarray.get(categoryselected)
                                 .get(getAdapterPosition()).deepClone();
-                        for (int z = 0; z < currentreport.getSelectedWorkers().size(); z++) {
-                            if (availableitemsarray.get(categoryselected).get(getAdapterPosition()).getIdNumber().equals(
-                                    currentreport.getSelectedWorkers().get(z).getIdNumber())) {
-                                boo = false;
+                        if(itemstype.equals(manpower)) {
+                            for (int z = 0; z < currentreport.getSelectedWorkers().size(); z++) {
+                                if (availableitemsarray.get(categoryselected).get(getAdapterPosition()).getIdNumber().equals(
+                                        currentreport.getSelectedWorkers().get(z).getIdNumber())) {
+                                    boo = false;
+                                }
+                            }
+                        }else if(itemstype.equals(equipment)){
+                            for (int z = 0; z < currentreport.getSelectedEquipment().size(); z++) {
+                                if (availableitemsarray.get(categoryselected).get(getAdapterPosition()).getIdNumber().equals(
+                                        currentreport.getSelectedEquipment().get(z).getIdNumber())) {
+                                    boo = false;
+                                }
                             }
                         }
                         if (boo) { //the worker is not included in the list
@@ -523,21 +538,12 @@ public class ManEquipFragment extends Fragment {
                                 }
                             }else if(itemstype.equals(equipment)){
                                 for (int i = 0; i < currentreport.getSelectedEquipment().size(); i++) {
-                                    if (currentreport.getSelectedWorkers().get(i).getIdNumber().equals(
+                                    if (currentreport.getSelectedEquipment().get(i).getIdNumber().equals(
                                             availableitemsarray.get(categoryselected).get(getAdapterPosition()).getIdNumber())) {
                                         currentreport.getSelectedEquipment().remove(i);
                                     }
                                 }
                             }
-                            /*if(itemstype.equals(manpower)) {
-                                currentreport.getSelectedWorkers().remove(
-                                        currentreport.getSelectedWorkers().indexOf(
-                                                availableitemsarray.get(categoryselected).get(getAdapterPosition())));
-                            }else if (itemstype.equals(equipment)){
-                                currentreport.getSelectedEquipment().remove(
-                                        currentreport.getSelectedEquipment().indexOf(
-                                                availableitemsarray.get(categoryselected).get(getAdapterPosition())));
-                            }*/
                             itemView.setBackgroundColor(0);
                         }
                 }
@@ -663,6 +669,7 @@ public class ManEquipFragment extends Fragment {
                     }
                 }
                 dialog.dismiss();
+                imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),0);
             }
         });
         CANCEL.setOnClickListener(new View.OnClickListener() {
@@ -672,6 +679,9 @@ public class ManEquipFragment extends Fragment {
             }
         });
         dialog.show();
+        editText.requestFocus();
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
+
     }
     //dialog to add worker
     private void showdialog2(final Worker_Object worker, final int position, final int caso){
@@ -789,7 +799,7 @@ public class ManEquipFragment extends Fragment {
                             }
                         }
                     }else if (itemstype.equals(equipment)){
-                        for (int i = 0; i < currentreport.getSelectedWorkers().size(); i++) {
+                        for (int i = 0; i < currentreport.getSelectedEquipment().size(); i++) {
                             if (currentreport.getSelectedEquipment().get(i).getIdNumber().equals(worker.getIdNumber())) {
                                 currentreport.getSelectedEquipment().set(i, worker);
                             }
@@ -799,6 +809,7 @@ public class ManEquipFragment extends Fragment {
                 }
                 madapter_6.notifyDataSetChanged();
                 dialog.dismiss();
+                imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),0);
             }
         });
 
@@ -812,6 +823,8 @@ public class ManEquipFragment extends Fragment {
 
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
+        edittext1.requestFocus();
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
     }
     private void add_activity_contractor(final String activity) {
         AlertDialog.Builder AddItemBuilder = new AlertDialog.Builder(getActivity());
@@ -849,6 +862,7 @@ public class ManEquipFragment extends Fragment {
                             break;
                     }
                     dialog.dismiss();
+                    imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),0);
                 }
             }
         });
@@ -861,6 +875,8 @@ public class ManEquipFragment extends Fragment {
 
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
+        edittext.requestFocus();
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
     }
 
 

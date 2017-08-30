@@ -19,6 +19,7 @@
         android:layout_height="2dp"
         android:background="@color/settings_gray"/>
     <EditText
+        android:inputType="textCapSentences"
         android:id="@+id/edittext1"
         android:background="@color/lightgray"
         android:layout_width="match_parent"

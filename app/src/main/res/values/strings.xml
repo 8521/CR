@@ -106,5 +106,7 @@
     <string name="fragment_reportinfofragment">fragment_reportinfofragment</string>
     <string name="fragment_reporttasksfragment">fragment_reporttasksfragment</string>
     <string name="fragment_editreport">fragment_editreport</string>
+    <string name="IncludeConstructionDateInReport">Include Construction Date\nin Report</string>
+    <string name="app_name_shorcut">Reporter</string>
 
 </resources>

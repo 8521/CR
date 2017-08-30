@@ -30,6 +30,7 @@
         android:id="@+id/edittext1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:inputType="textCapSentences"
         android:maxLines="1"
         style="@style/textstyle_B"
         android:background="@color/lightgray"
