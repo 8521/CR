@@ -27,7 +27,7 @@
         android:layout_height="match_parent"
         android:background="#fff"
         android:orientation="vertical" >
-        <com.ilaquidain.constructionreporter.object.RectangularImageView
+        <com.ilaquidain.constructionreporterpro.object.RectangularImageView
             android:layout_width="match_parent"
             android:layout_marginStart="@dimen/dp10"
             android:layout_marginEnd="@dimen/dp10"

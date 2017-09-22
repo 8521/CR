@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.ilaquidain.constructionreporter">
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.ilaquidain.constructionreporterpro">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
         android:fullBackupContent="true"
         android:allowBackup="true"
-        android:icon="@drawable/constructionreportericon"
+        android:icon="@drawable/logopro"
         android:label="@string/app_name_shorcut"
-        android:roundIcon="@drawable/constructionreportericon"
+        android:roundIcon="@drawable/logopro"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <provider
             android:name="android.support.v4.content.FileProvider"
-            android:authorities="com.ilaquidain.constructionreporter.provider"
+            android:authorities="com.ilaquidain.constructionreporterpro.provider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
@@ -22,7 +23,7 @@
                 android:resource="@xml/provider_paths"/>
         </provider>
         <activity
-            android:name=".activities.SplashScreenActivity"
+            android:name="com.ilaquidain.constructionreporterpro.activities.SplashScreenActivity"
             android:screenOrientation="portrait"
             android:label="@string/app_name_shorcut"
             android:theme="@style/SplashTheme">
@@ -32,11 +33,9 @@
             </intent-filter>>
         </activity>
         <activity
-            android:name=".activities.MainActivity"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustPan"
+            android:name="com.ilaquidain.constructionreporterpro.activities.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
-
         </activity>
 
     </application>

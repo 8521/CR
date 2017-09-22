@@ -92,7 +92,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:weightSum="8">
-                <com.ilaquidain.constructionreporter.object.RectangularImageView
+                <com.ilaquidain.constructionreporterpro.object.RectangularImageView
                     android:id="@+id/projectlogoview"
                     android:scaleType="centerCrop"
                     android:layout_width="225dp"

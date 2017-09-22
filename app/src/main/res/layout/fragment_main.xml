@@ -16,7 +16,7 @@
             android:paddingTop="@dimen/dp10"
             android:paddingBottom="@dimen/dp10"
             android:layout_marginBottom="@dimen/dp5">
-            <com.ilaquidain.constructionreporter.object.SquareImageView
+            <com.ilaquidain.constructionreporterpro.object.SquareImageView
                 android:id="@+id/ProjectLogo"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
@@ -63,6 +63,7 @@
 
             <RelativeLayout
                 android:id="@+id/OptionA"
+                android:background="@drawable/selected_relative_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <TextView
@@ -86,6 +87,7 @@
             </RelativeLayout>
             <RelativeLayout
                 android:id="@+id/OptionB"
+                android:background="@drawable/selected_relative_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <TextView
@@ -109,6 +111,7 @@
             </RelativeLayout>
             <RelativeLayout
                 android:id="@+id/RelLay_ViewPDFs"
+                android:background="@drawable/selected_relative_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <TextView
@@ -130,9 +133,129 @@
                     android:layout_below="@id/TextOptionD"
                     android:background="@color/settings_gray"/>
             </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/RelLay_EditActivities"
+                android:background="@drawable/selected_relative_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/TextOptionI"
+                    style="@style/textstyle_A"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="@string/MainMenu_I" />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_chevron_right_black_24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"/>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_below="@id/TextOptionI"
+                    android:background="@color/settings_gray"/>
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/RelLay_EditContractors"
+                android:background="@drawable/selected_relative_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/TextOptionE"
+                    style="@style/textstyle_A"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="@string/MainMenu_E" />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_chevron_right_black_24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"/>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_below="@id/TextOptionE"
+                    android:background="@color/settings_gray"/>
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/RelLay_ProuctionUnits"
+                android:background="@drawable/selected_relative_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/TextOptionH"
+                    style="@style/textstyle_A"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="@string/MainMenu_H" />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_chevron_right_black_24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"/>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_below="@id/TextOptionH"
+                    android:background="@color/settings_gray"/>
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/RelLay_ProjectNotes"
+                android:background="@drawable/selected_relative_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/TextOptionF"
+                    style="@style/textstyle_A"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="@string/MainMenu_F" />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_chevron_right_black_24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"/>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_below="@id/TextOptionF"
+                    android:background="@color/settings_gray"/>
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/RelLay_Safety_Information"
+                android:background="@drawable/selected_relative_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/TextOptionG"
+                    style="@style/textstyle_A"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="@string/MainMenu_G" />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_chevron_right_black_24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"/>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_below="@id/TextOptionG"
+                    android:background="@color/settings_gray"/>
+            </RelativeLayout>
         </LinearLayout>
     </LinearLayout>
-    <com.google.android.gms.ads.AdView
+    <!--<com.google.android.gms.ads.AdView
         xmlns:ads="http://schemas.android.com/apk/res-auto"
         android:id="@+id/add_banner_1"
         android:layout_width="match_parent"
@@ -141,6 +264,6 @@
         android:layout_alignParentBottom="true"
         ads:adSize="SMART_BANNER"
         ads:adUnitId="ca-app-pub-9978137837326968/8247754133">
-    </com.google.android.gms.ads.AdView>
+    </com.google.android.gms.ads.AdView>-->
 </RelativeLayout>
 

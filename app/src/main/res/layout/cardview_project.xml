@@ -8,6 +8,7 @@
     android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <LinearLayout
+        android:baselineAligned="false"
         android:layout_width="match_parent"
         android:orientation="horizontal"
         android:background="@drawable/cardview1"
@@ -17,7 +18,7 @@
             android:layout_width="0dp"
             android:layout_weight="2"
             android:layout_height="match_parent">
-            <com.ilaquidain.constructionreporter.object.SquareImageView
+            <com.ilaquidain.constructionreporterpro.object.SquareImageView
                 android:id="@+id/ProjectLogo"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
@@ -29,6 +30,7 @@
 
         <RelativeLayout
             android:id="@+id/rellay_middle"
+            android:background="?attr/selectableItemBackground"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="6">
@@ -76,7 +78,6 @@
                 android:layout_height="wrap_content"
                 android:src="@android:drawable/ic_menu_edit"
                 android:tint="@color/black"
-                android:background="@android:color/transparent"
                 android:layout_marginEnd="@dimen/dp10"/>
 
 

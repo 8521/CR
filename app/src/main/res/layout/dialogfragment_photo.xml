@@ -30,7 +30,7 @@
                 android:layout_height="2dp"
                 android:background="@color/settings_gray"
                 android:layout_below="@id/recyclerviewtitle"/>
-            <com.ilaquidain.constructionreporter.object.SquareImageView
+            <com.ilaquidain.constructionreporterpro.object.SquareImageView
                 android:id="@+id/image1"
                 android:layout_width="match_parent"
                 android:layout_marginStart="50dp"
