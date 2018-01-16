@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    android:id="@+id/projectcardview"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:padding="@dimen/dp10">
+    <LinearLayout
+        android:background="@drawable/selected_element"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/txt_contractor_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dp10"
+                style="@style/textstyle_C"
+                tools:text="SFI"/>
+        </RelativeLayout>
+        <LinearLayout
+            android:visibility="gone"
+            android:baselineAligned="false"
+            android:id="@+id/expanded_contractorview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/txt_expanded_contractoraddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start|center_vertical"
+                tools:text="Address: 334 Gladys Av., 92691, CA"
+                android:hint="Address"
+                android:textColor="@color/black"
+                android:padding="5dp" />
+            <TextView
+                android:id="@+id/txt_expanded_contractornumber"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="Number: 561-124-8596"
+                android:textColor="@color/black"
+                android:hint="Phone Number"
+                android:padding="@dimen/dp5"
+                android:gravity="start|center_vertical"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/dp10"
+                android:weightSum="3">
+                <TextView
+                    android:id="@+id/txt_expanded_contractoredit"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Edit"
+                    android:textColor="@color/black"
+                    android:drawableTop="@drawable/ic_mode_edit_black_24dp"
+                    android:drawablePadding="@dimen/dp10"
+                    android:textAlignment="center"
+                    android:layout_gravity="center"/>
+                <TextView
+                    android:id="@+id/txt_expanded_contractordelete"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Delete"
+                    android:textColor="@color/black"
+                    android:drawableTop="@drawable/ic_delete_forever_black_24dp"
+                    android:drawablePadding="@dimen/dp10"
+                    android:textAlignment="center"
+                    android:layout_gravity="center"/>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</android.support.v7.widget.CardView>

@@ -62,7 +62,7 @@ public class ReportInfoFragment extends Fragment implements View.OnClickListener
         }
 
 
-        FloatingActionButton fabaccet = (FloatingActionButton)v.findViewById(R.id.fabaccept);
+        FloatingActionButton fabaccet = v.findViewById(R.id.fabaccept);
         fabaccet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -70,12 +70,12 @@ public class ReportInfoFragment extends Fragment implements View.OnClickListener
             }
         });
 
-        reportdate = (TextView)v.findViewById(R.id.df_projectinfo_3);
-        reporttype = (TextView)v.findViewById(R.id.df_projectinfo_6);
-        discipline = (TextView)v.findViewById(R.id.df_projectinfo_9);
-        reportweather = (TextView)v.findViewById(R.id.df_projectinfo_12);
-        startime = (TextView)v.findViewById(R.id.df_projectinfo_15);
-        endtime = (TextView)v.findViewById(R.id.df_projectinfo_16);
+        reportdate = v.findViewById(R.id.df_projectinfo_3);
+        reporttype = v.findViewById(R.id.df_projectinfo_6);
+        discipline = v.findViewById(R.id.df_projectinfo_9);
+        reportweather = v.findViewById(R.id.df_projectinfo_12);
+        startime = v.findViewById(R.id.df_projectinfo_15);
+        endtime = v.findViewById(R.id.df_projectinfo_16);
 
         reportdate.setText(currentreport.getReportInfo().get(8));
         reporttype.setText(currentreport.getReportInfo().get(6));

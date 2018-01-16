@@ -63,6 +63,7 @@
 
             <RelativeLayout
                 android:id="@+id/OptionA"
+                android:background="@drawable/selected_relative_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <TextView
@@ -86,6 +87,7 @@
             </RelativeLayout>
             <RelativeLayout
                 android:id="@+id/OptionB"
+                android:background="@drawable/selected_relative_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <TextView
@@ -109,6 +111,7 @@
             </RelativeLayout>
             <RelativeLayout
                 android:id="@+id/RelLay_ViewPDFs"
+                android:background="@drawable/selected_relative_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <TextView
@@ -128,6 +131,30 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_below="@id/TextOptionD"
+                    android:background="@color/settings_gray"/>
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/RelLay_EditContractors"
+                android:background="@drawable/selected_relative_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/TextOptionE"
+                    style="@style/textstyle_A"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="@string/MainMenu_E" />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_chevron_right_black_24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"/>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_below="@id/TextOptionE"
                     android:background="@color/settings_gray"/>
             </RelativeLayout>
         </LinearLayout>

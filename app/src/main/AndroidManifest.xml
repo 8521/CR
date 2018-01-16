@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.ilaquidain.constructionreporter">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
@@ -25,18 +26,17 @@
             android:name=".activities.SplashScreenActivity"
             android:screenOrientation="portrait"
             android:label="@string/app_name_shorcut"
-            android:theme="@style/SplashTheme">
+            android:theme="@style/SplashTheme"
+            tools:ignore="ExtraText">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>>
+            </intent-filter>
         </activity>
         <activity
             android:name=".activities.MainActivity"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustPan"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
-
         </activity>
 
     </application>

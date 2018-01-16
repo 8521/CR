@@ -23,17 +23,11 @@
     <string name="Weather">Weather</string>
     <string name="ReportInfo">Report Information</string>
     <string name="photoinformation">Photo Information</string>
-    <string name="ReportPhotos">Report Photos</string>
-    <string name="action_help">Help</string>
     <string name="ReportTime">Report Time</string>
     <string name="Start">Start Time</string>
     <string name="EndTime">End Time</string>
     <string name="ProjectLogo">Project Logo</string>
-    <string name="sampletaskdescription">Construction of the foundations ongoing. Pile #5 was poured today with no exceptions noted. Drillin of piles #7 and #8 continues with no issues.</string>
-    <string name="EditItem">Edit Item</string>
-    <string name="Name">Name</string>
     <string name="Activity">Activity</string>
-    <string name="company">Company</string>
     <string name="CompanyLogo">Company Logo</string>
     <string name="cancel">Cancel</string>
     <string name="select">Select</string>
@@ -60,13 +54,8 @@
     <string name="Back">Back</string>
     <string name="AddActivityToReport">Add Activity To Report</string>
     <string name="PhotoDescription">Photo Description</string>
-    <string name="NewActivity">New Activity</string>
-    <string name="NewContractor">New Contractor</string>
     <string name="NewReport">New Report</string>
     <string name="EditReport">Edit Report</string>
-    <string-array name="defaultspinner">
-        <item>Default_Activity</item>
-    </string-array>
     <string-array name="hours">
         <item>1</item>
         <item>2</item>
@@ -93,6 +82,28 @@
         <item>High</item>
     </string-array>
 
+    <string-array name="holiday">
+        <item>09/04/17</item>
+        <item>10/09/17</item>
+        <item>11/10/17</item>
+        <item>11/23/17</item>
+        <item>11/24/17</item>
+        <item>12/25/17</item>
+        <item>01/01/18</item>
+        <item>01/15/18</item>
+        <item>02/12/18</item>
+        <item>02/19/18</item>
+        <item>05/28/18</item>
+        <item>07/04/18</item>
+        <item>09/03/18</item>
+        <item>10/08/18</item>
+        <item>11/12/18</item>
+        <item>11/22/18</item>
+        <item>11/23/18</item>
+        <item>12/25/18</item>
+        <item>01/01/19</item>
+    </string-array>
+
     <string name="fragment_settings">fragment_settings</string>
     <string name="fragment_menuprojects">fragment_menuprojects</string>
     <string name="fragment_projectmenu">fragment_projectmenu</string>
@@ -100,13 +111,15 @@
     <string name="fragment_editviewreports">fragment_editviewreports</string>
     <string name="fragment_newreport">fragment_newreport"</string>
     <string name="fragment_equipmentfragment">fragment_equipmentfragment</string>
-    <string name="fragment_manpowerfragment">fragment_manpowerfragment</string>
     <string name="fragment_newprojectfragment">fragment_newprojectfragment</string>
     <string name="fragment_photosfragment">fragment_photosfragment</string>
     <string name="fragment_reportinfofragment">fragment_reportinfofragment</string>
     <string name="fragment_reporttasksfragment">fragment_reporttasksfragment</string>
     <string name="fragment_editreport">fragment_editreport</string>
+    <string name="fragment_contractors">fragment_contractors</string>
     <string name="IncludeConstructionDateInReport">Include Construction Date\nin Report</string>
     <string name="app_name_shorcut">Reporter</string>
+    <string name="MainMenu_E">Edit Contractors</string>
+    <string name="GeneratingPDFReport">Generating PDF\nReport</string>
 
 </resources>

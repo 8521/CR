@@ -73,18 +73,18 @@ public class ReportTasksFragment extends Fragment implements View.OnClickListene
 
         View v = inflater.inflate(R.layout.dialogfragment_manpower,container,false);
 
-        TextView title = (TextView)v.findViewById(R.id.recyclerviewtitle);
+        TextView title = v.findViewById(R.id.recyclerviewtitle);
         title.setText("Activities Selected");
 
-        FloatingActionButton fab = (FloatingActionButton)v.findViewById(R.id.fabaddmanpower);
+        FloatingActionButton fab = v.findViewById(R.id.fabaddmanpower);
         fab.setImageResource(R.drawable.ic_add_black_24dp);
         fab.setOnClickListener(this);
 
-        FloatingActionButton fab2 = (FloatingActionButton)v.findViewById(R.id.fabaccept);
+        FloatingActionButton fab2 = v.findViewById(R.id.fabaccept);
         fab2.setImageResource(R.drawable.ic_check_black_24dp);
         fab2.setOnClickListener(this);
 
-        mrecyclerView_7 = (RecyclerView)v.findViewById(R.id.recyclerview_manpower);
+        mrecyclerView_7 = v.findViewById(R.id.recyclerview_manpower);
         mrecyclerView_7.setLayoutManager(new LinearLayoutManager(getActivity()));
         madapter_7 = new adapter_7(getActivity());
         mrecyclerView_7.setAdapter(madapter_7);
@@ -156,7 +156,7 @@ public class ReportTasksFragment extends Fragment implements View.OnClickListene
 
         private viewholder_7(View itemView) {
             super(itemView);
-            textView = (TextView)itemView.findViewById(R.id.text1);
+            textView = itemView.findViewById(R.id.text1);
             itemView.setOnClickListener(this);
         }
 
@@ -169,10 +169,6 @@ public class ReportTasksFragment extends Fragment implements View.OnClickListene
             mprefedit.putInt("tasknumber",taskposition);
             mprefedit.apply();
 
-            //Bundle bundle42 = new Bundle();
-            //bundle42.putSerializable("task",taskslist.get(getAdapterPosition()));
-            //edittask.setArguments(bundle42);
-            //edittask.setTargetFragment(currentfragment,104);
             edittask.show(getFragmentManager(),"Dialog");
         }
 

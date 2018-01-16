@@ -28,7 +28,7 @@
             android:background="@android:color/transparent"
             android:layout_below="@id/elemento1"
             android:padding="@dimen/dp10"
-            android:paddingBottom="80dp"
+            android:layout_above="@+id/fabaccept"
             android:gravity="top"
             tools:text="@string/longtextprueba"
             android:id="@+id/edittext1"

@@ -53,6 +53,7 @@ import static android.app.Activity.RESULT_OK;
 public class Photos_Fragment extends Fragment implements View.OnClickListener{
 
     static final int PICK_IMAGE_4 = 423;
+    static final int scalefactor = 4;
     private int positionsent;
     private String mCurrentPhotoPath;
     private BitmapFactory.Options bmOptions = new BitmapFactory.Options();
@@ -93,9 +94,9 @@ public class Photos_Fragment extends Fragment implements View.OnClickListener{
 
         new loadphotos().execute();
 
-        add_Photo = (FloatingActionButton)v.findViewById(R.id.fabaddphoto);
+        add_Photo = v.findViewById(R.id.fabaddphoto);
         add_Photo.setOnClickListener(this);
-        FloatingActionButton fabaccept = (FloatingActionButton)v.findViewById(R.id.fabaccept);
+        FloatingActionButton fabaccept = v.findViewById(R.id.fabaccept);
         fabaccept.setOnClickListener(this);
 
         if(ContextCompat.checkSelfPermission(getActivity(),
@@ -105,7 +106,7 @@ public class Photos_Fragment extends Fragment implements View.OnClickListener{
                     {android.Manifest.permission.WRITE_EXTERNAL_STORAGE},0);
         }
 
-        mrecyclerview = (RecyclerView)v.findViewById(R.id.recyclerview);
+        mrecyclerview = v.findViewById(R.id.recyclerview);
         mrecyclerview.setLayoutManager(new GridLayoutManager(getActivity(),2));
         madapter = new photoadapter();
         mrecyclerview.setAdapter(madapter);
@@ -266,9 +267,8 @@ public class Photos_Fragment extends Fragment implements View.OnClickListener{
     private void SetUpBitMapOptions() {
         bmOptions = new BitmapFactory.Options();
         bmOptions.inJustDecodeBounds = true;
-        int scaleFactor = 16;
         bmOptions.inJustDecodeBounds = false;
-        bmOptions.inSampleSize = scaleFactor;
+        bmOptions.inSampleSize = scalefactor;
     }
     private void galleryAddPic() {
         Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
@@ -330,16 +330,16 @@ public class Photos_Fragment extends Fragment implements View.OnClickListener{
 
         public photoviewholder(View itemView) {
             super(itemView);
-            viewFlipper = (ViewFlipper)itemView.findViewById(R.id.viewflipper);
-            viewphoto = (Button)itemView.findViewById(R.id.btn_viewphoto);
-            editphoto = (Button)itemView.findViewById(R.id.btn_editphoto);
-            deletephoto = (Button)itemView.findViewById(R.id.btn_deletephoto);
+            viewFlipper = itemView.findViewById(R.id.viewflipper);
+            viewphoto = itemView.findViewById(R.id.btn_viewphoto);
+            editphoto = itemView.findViewById(R.id.btn_editphoto);
+            deletephoto = itemView.findViewById(R.id.btn_deletephoto);
 
             viewphoto.setOnClickListener(this);
             editphoto.setOnClickListener(this);
             deletephoto.setOnClickListener(this);
 
-            view = (ImageView)itemView.findViewById(R.id.image1);
+            view = itemView.findViewById(R.id.image1);
             viewFlipper.setInAnimation(getActivity(),android.R.anim.slide_in_left);
             viewFlipper.setOutAnimation(getActivity(),android.R.anim.slide_out_right);
             //viewFlipper.setInAnimation(getActivity(),R.anim.rotation_enter);

@@ -22,11 +22,13 @@ import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.ilaquidain.constructionreporter.R;
 import com.ilaquidain.constructionreporter.activities.MainActivity;
+import com.ilaquidain.constructionreporter.object.Project_Object;
 import com.ilaquidain.constructionreporter.object.Report_Object;
 import com.ilaquidain.constructionreporter.object.Saved_Info_Object;
 import com.ilaquidain.constructionreporter.object.Task_Object;
@@ -53,11 +55,12 @@ public class chooseactivity_dialogfragment extends DialogFragment implements Vie
 
     private int lightred;
     private Report_Object currentreport;
+    private Project_Object currentproject;
 
     private RecyclerView mrecyclerview;
     private adapter_1 madapter;
 
-    private ArrayList<String> AvailableTasks;
+    private ArrayList<Task_Object> AvailableTasks = new ArrayList<>();
     private ArrayList<Task_Object> selectedtasks;
 
     private ItemTouchHelper itemtouchhelper8;
@@ -97,8 +100,10 @@ public class chooseactivity_dialogfragment extends DialogFragment implements Vie
         reportnumber = mpref.getInt("reportnumber",-1);
         savedinfo = ((MainActivity)getActivity()).getSaved_info();
         if(savedinfo!=null && projectnumber != -1 && reportnumber!=-1) {
+            currentproject = savedinfo.getSavedProjects().get(projectnumber);
             currentreport = savedinfo.getSavedProjects().get(projectnumber).getProjectReports().get(reportnumber);
-        }else if(savedinfo!=null && reportnumber==-1){
+        }else if(savedinfo!=null && projectnumber != -1 && reportnumber==-1){
+            currentproject = savedinfo.getSavedProjects().get(projectnumber);
             currentreport = savedinfo.getTempreport();
         }else{
             if ( getFragmentManager().getBackStackEntryCount() > 0)
@@ -107,11 +112,10 @@ public class chooseactivity_dialogfragment extends DialogFragment implements Vie
 
         lightred = ContextCompat.getColor(getActivity(),R.color.selection_light_orange);
 
-        if(savedinfo.getListasOpciones().get(9)!=null){
-            AvailableTasks = new ArrayList<>(savedinfo.getListasOpciones().get(9));}
-        else {
-            AvailableTasks = new ArrayList<>();
+        for(int i=0;i<currentproject.getListAvailableTasks().size();i++){
+            AvailableTasks.add(currentproject.getListAvailableTasks().get(i));
         }
+
         if(currentreport.getSelectedTasks()!=null){
             selectedtasks = currentreport.getSelectedTasks();
         }else {
@@ -120,18 +124,18 @@ public class chooseactivity_dialogfragment extends DialogFragment implements Vie
 
         View v = inflater.inflate(R.layout.dialogfragment_manpower,container,false);
 
-        TextView title = (TextView)v.findViewById(R.id.recyclerviewtitle);
+        TextView title = v.findViewById(R.id.recyclerviewtitle);
         title.setText(getResources().getText(R.string.AddActivityToReport));
 
-        FloatingActionButton fab = (FloatingActionButton)v.findViewById(R.id.fabaddmanpower);
+        FloatingActionButton fab = v.findViewById(R.id.fabaddmanpower);
         fab.setImageResource(R.drawable.ic_add_black_24dp);
         fab.setOnClickListener(this);
 
-        FloatingActionButton fab2 = (FloatingActionButton)v.findViewById(R.id.fabaccept);
+        FloatingActionButton fab2 = v.findViewById(R.id.fabaccept);
         fab2.setImageResource(R.drawable.ic_check_black_24dp);
         fab2.setOnClickListener(this);
 
-        mrecyclerview = (RecyclerView)v.findViewById(R.id.recyclerview_manpower);
+        mrecyclerview = v.findViewById(R.id.recyclerview_manpower);
         mrecyclerview.setLayoutManager(new LinearLayoutManager(getActivity()));
         madapter = new adapter_1();
         mrecyclerview.setAdapter(madapter);
@@ -150,7 +154,7 @@ public class chooseactivity_dialogfragment extends DialogFragment implements Vie
         }else {
             savedinfo.getSavedProjects().get(projectnumber).getProjectReports().set(reportnumber,currentreport);
         }
-        savedinfo.getListasOpciones().set(9,AvailableTasks);
+        savedinfo.getSavedProjects().get(projectnumber).setListAvailableTasks(AvailableTasks);
         ((MainActivity)getActivity()).setSaved_info(savedinfo);
         getDialog().dismiss();
     }
@@ -166,6 +170,9 @@ public class chooseactivity_dialogfragment extends DialogFragment implements Vie
         }
     }
     private void showinputdialog() {
+        if(getActivity().getCurrentFocus()!=null){
+            getActivity().getCurrentFocus().clearFocus();
+        }
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Add New Activity");
         final EditText edittext = new EditText(getActivity());
@@ -178,7 +185,9 @@ public class chooseactivity_dialogfragment extends DialogFragment implements Vie
             public void onClick(DialogInterface dialog, int which) {
                 if(!edittext.getText().toString().equals("")&&
                         !AvailableTasks.contains(edittext.getText().toString())){
-                    AvailableTasks.add(edittext.getText().toString());
+                    Task_Object temptask = new Task_Object();
+                    temptask.setTaskName(edittext.getText().toString());
+                    AvailableTasks.add(temptask);
                     madapter.notifyDataSetChanged();
                 }else{
                     madapter.notifyDataSetChanged();
@@ -191,7 +200,14 @@ public class chooseactivity_dialogfragment extends DialogFragment implements Vie
 
             }
         });
-        builder.show();
+        Dialog dialog = builder.create();
+
+        if(dialog.getWindow()!=null){
+            dialog.getWindow().setSoftInputMode
+                (WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+            //edittext.hasFocus();
+        }
+        dialog.show();
     }
 
 
@@ -220,11 +236,11 @@ public class chooseactivity_dialogfragment extends DialogFragment implements Vie
         public void onBindViewHolder(viewholder_1 holder, int position) {
             holder.textView.setBackgroundColor(0);
             for(int i=0;i<selectedtasks.size();i++){
-                if(selectedtasks.get(i).getTaskName().equals(AvailableTasks.get(position))){
+                if(selectedtasks.get(i).getTaskName().equals(AvailableTasks.get(position).getTaskName())){
                     holder.itemView.setBackgroundColor(lightred);
                 }
             }
-            holder.textView.setText(AvailableTasks.get(position));
+            holder.textView.setText(AvailableTasks.get(position).getTaskName());
         }
 
         @Override
@@ -241,9 +257,9 @@ public class chooseactivity_dialogfragment extends DialogFragment implements Vie
 
         @Override
         public void onItemDismiss(final int position) {
-            final String s1 = AvailableTasks.get(position);
+            final Task_Object s1 = AvailableTasks.get(position);
             Snackbar snackbar = Snackbar
-                    .make(mrecyclerview, "PHOTO REMOVED", Snackbar.LENGTH_LONG)
+                    .make(mrecyclerview, "ACTIVITY REMOVED", Snackbar.LENGTH_LONG)
                     .setAction("UNDO", new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -262,14 +278,14 @@ public class chooseactivity_dialogfragment extends DialogFragment implements Vie
 
         private viewholder_1(View itemView) {
             super(itemView);
-            textView = (TextView)itemView.findViewById(R.id.text1);
+            textView = itemView.findViewById(R.id.text1);
             itemView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
             itemView.setBackgroundColor(lightred);
-            String name = AvailableTasks.get(getAdapterPosition());
+            String name = AvailableTasks.get(getAdapterPosition()).getTaskName();
             Boolean notincluded = true;
             for(int i=0;i<selectedtasks.size();i++){
                 if(name.equals(selectedtasks.get(i).getTaskName())){notincluded=false;}
@@ -279,7 +295,6 @@ public class chooseactivity_dialogfragment extends DialogFragment implements Vie
                 task.setTaskName(name);
                 selectedtasks.add(task);
             }
-            madapter.notifyDataSetChanged();
         }
 
         @Override

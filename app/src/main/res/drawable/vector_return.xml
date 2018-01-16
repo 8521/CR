@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/drawable/heart.xml -->
+<vector
+    android:height="256dp"
+    android:width="256dp"
+    android:viewportHeight="20"
+    android:viewportWidth="20"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--<path
+        android:fillColor="#ff0000"
+        android:pathData="M20.5,9.5
+                        c-1.955,0,-3.83,1.268,-4.5,3
+                        c-0.67,-1.732,-2.547,-3,-4.5,-3
+                        C8.957,9.5,7,11.432,7,14
+                        c0,3.53,3.793,6.257,9,11.5
+                        c5.207,-5.242,9,-7.97,9,-11.5
+                        C25,11.432,23.043,9.5,20.5,9.5z" />-->
+    <path
+        android:strokeColor="#000"
+        android:strokeWidth="2"
+        android:pathData="M1,16
+                l10,0
+                m0,-10c10,0,10,10,0,10
+                m0,-10l-4,0"/>
+    <path
+        android:strokeColor="#000"
+        android:fillColor="#000"
+        android:pathData="M12,10 l-8,-4 l8,-4z"
+        />
+</vector>

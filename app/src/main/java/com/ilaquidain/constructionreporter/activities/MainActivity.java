@@ -10,6 +10,8 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -63,8 +65,10 @@ import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -97,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
     private final static String IncludePhotos = "IncludePhotos";
     private final static String PhotosQuality = "PhotosQuality";
     private Font Cal11BU,Cal11B,Cal9,Cal9B_White;
+    private Bitmap bitmaphoto;
 
     @Override
     protected void onPause() {
@@ -111,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
 
@@ -183,6 +188,7 @@ public class MainActivity extends AppCompatActivity {
                         .commit();
                 break;
             case "fragment_editviewreports":
+            case "fragment_contractors":
             case "fragment_viewpdfs":
                 fgmt = new F_1_1_ProjectMenu();
                 fm.beginTransaction()
@@ -193,7 +199,12 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case "fragment_newreport":
                 final Fragment fgmt2 = new F_1_1_ProjectMenu();
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                fm.beginTransaction()
+                    .setCustomAnimations(R.animator.slide_right_enter,R.animator.slide_left_exit)
+                    .replace(R.id.MainFrame,fgmt2,"fragment_projectmenu")
+                    .addToBackStack("fragment_projectmenu")
+                    .commit();
+                /*AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage("Do you want to save the Report before existing?");
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
@@ -226,7 +237,8 @@ public class MainActivity extends AppCompatActivity {
                                 .commit();
                     }
                 });
-                builder.show();
+                builder.setCancelable(false);
+                builder.show();*/
                 break;
             case "fragment_reportinfofragment":
             case "fragment_equipmentfragment":
@@ -428,6 +440,38 @@ public class MainActivity extends AppCompatActivity {
         }
         AddDefaultInfo();
     }
+
+    /*public void SaveInfoToMemory2() {
+        Saved_Info_Object_2 tempinfo = getSaved_info();
+        if(tempinfo==null){tempinfo = new Saved_Info_Object();}
+        String FileNameTrades = "Info.data";
+        try{
+            File f = new File(getApplicationContext().getFilesDir(),FileNameTrades);
+            FileOutputStream fout = new FileOutputStream(f);
+            ObjectOutputStream out = new ObjectOutputStream(fout);
+            out.writeObject(tempinfo);
+            out.close();
+        }catch (Exception e){e.printStackTrace();}
+    }
+    public void GetInfoFromMemory2() {
+        Saved_Info_Object tempinfo2 = new Saved_Info_Object();
+        String S1 = "Info.data";
+        try{
+            FileInputStream fileIn2 = new FileInputStream(getFilesDir()+ File.separator+S1);
+            ObjectInput in2 = new ObjectInputStream(fileIn2);
+            tempinfo2 = (Saved_Info_Object) in2.readObject();
+            in2.close();
+        }catch (Exception e){e.printStackTrace();}
+
+        if(tempinfo2==null){
+            tempinfo2 = new Saved_Info_Object();
+            setSaved_info(tempinfo2);
+        }else {
+            setSaved_info(tempinfo2);
+        }
+        AddDefaultInfo();
+    }*/
+
     private void AddDefaultInfo() {
         //Report Info
         //Option 0 -- Default Options
@@ -508,9 +552,9 @@ public class MainActivity extends AppCompatActivity {
                 templist1.add(templist2);
             }
             savedinfo_2.setListasOpciones(templist1);
+            this.setSaved_info(savedinfo_2);
         }
-
-        if(savedinfo_2.getWorkerGroups().size()==0){
+        /*if(savedinfo_2.getWorkerGroups().size()==0){
             ArrayList<String> templist3 = new ArrayList<>();
             templist3.add("Carpenters");
             templist3.add("Ironworkers");
@@ -592,7 +636,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             this.setSaved_info(savedinfo_2);
-        }
+        }*/
     }
     public void GeneratePDFReport(Project_Object currentproject, int reportposition){
 
@@ -882,7 +926,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String getConstructionDate(String s) {
-        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy");
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy", Locale.US);
         ArrayList<Integer> holidays = new ArrayList<>();
         Date reportdate = new Date();
         Date referencedate = new Date();
@@ -897,12 +941,26 @@ public class MainActivity extends AppCompatActivity {
         int originatconsdate = 88;
         Calendar c = Calendar.getInstance();
         c.setTime(referencedate);
+
         for(int i=0;i<dif2;i++){
             c.add(Calendar.DATE,1);
             Date tempdate = c.getTime();
-            if(c.get(Calendar.DAY_OF_WEEK)!=Calendar.SATURDAY && c.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY &&
-                    !sdf.format(tempdate).equals("09/04/17") && !sdf.format(tempdate).equals("10/09/17") &&
-                    !sdf.format(tempdate).equals("11/10/17")){
+            boolean isholiday = true;
+            ArrayList holidaydates = new ArrayList<String>
+                    (Arrays.asList(getResources().getStringArray(R.array.holiday)));
+            //Comprobamos si es sabado o domingo
+            if(c.get(Calendar.DAY_OF_WEEK)==Calendar.SATURDAY ||
+                    c.get(Calendar.DAY_OF_WEEK)==Calendar.SUNDAY){
+                isholiday = false;
+            }
+            //Comprobamos si coincide con alguna fiesta
+            for (int k=0;k<holidaydates.size();k++){
+                if(sdf.format(tempdate).equals(holidaydates.get(k))){
+                    isholiday = false;
+                }
+            }
+            //Si es verdadero añadimos uno al numero
+            if(isholiday){
                 originatconsdate = originatconsdate +1;
                 holidays.add(0);
             }else{
@@ -911,6 +969,8 @@ public class MainActivity extends AppCompatActivity {
         }
         String returnvalue;
         c.setTime(reportdate);
+
+        //comprobamos si los dias anteriores son fiesta
         if(holidays.get(holidays.size()-1)==1 && holidays.get(holidays.size()-2)==1&&
                 holidays.get(holidays.size()-3)==1&&holidays.get(holidays.size()-4)==1){
             returnvalue = String.valueOf(originatconsdate)+"D";
@@ -1300,29 +1360,69 @@ public class MainActivity extends AppCompatActivity {
     }
     private void ConvertPhotosToImages() {
         bmOptions = new BitmapFactory.Options();
-        bmOptions.inJustDecodeBounds = true;
-        String photosquality = msharedpreferences.getString(PhotosQuality,"Medium");
-        int scaleFactor;
-        switch (photosquality){
-            case "High":scaleFactor =2;break;
-            case "Medium":scaleFactor=4;break;
-            case "Low":scaleFactor =8;break;
-            default:scaleFactor=4;break;}
         bmOptions.inJustDecodeBounds = false;
-        bmOptions.inSampleSize = scaleFactor;
+        String photosquality = msharedpreferences.getString(PhotosQuality,"Medium");
         imagenes = new ArrayList<>();
+        int maxpixels;
+        Bitmap tempbitmap;
+
+        switch (photosquality){
+            case "High":
+                maxpixels = 800;
+                break;
+            case "Medium":
+                maxpixels = 400;
+                break;
+            case "Low":
+                maxpixels = 200;
+                break;
+            default:
+                maxpixels = 400;
+                break;
+        }
+
         try{
             for(int i=0;i<mcurrentreport.getSelectedPhotos().size();i++){
                 String photopath = mcurrentreport.getSelectedPhotos().get(i).getPathDevice();
-                Bitmap bitmapphoto = BitmapFactory.decodeFile(photopath, bmOptions);
+
+                bitmaphoto = BitmapFactory.decodeFile(photopath,bmOptions);
+
+                int height1 = bitmaphoto.getHeight();
+                int width1 = bitmaphoto.getWidth();
+
+                if(height1>width1){
+                    Double scale = ((double)height1) / maxpixels;
+                    double tempdouble = ((double)height1)/scale;
+                    int newheight = (int) tempdouble;
+                    tempdouble = ((double)width1)/scale;
+                    int newwidth = (int) tempdouble;
+
+                    tempbitmap = Bitmap.createScaledBitmap(bitmaphoto,newwidth,newheight,true);
+                    bitmaphoto.recycle();
+                    bitmaphoto = tempbitmap;
+
+                }else if(width1>height1){
+                    Double scale = ((double)width1) / maxpixels;
+                    double tempdouble = ((double)height1)/scale;
+                    int newheight = (int) tempdouble;
+                    tempdouble = ((double)width1)/scale;
+                    int newwidth = (int) tempdouble;
+
+                    tempbitmap = Bitmap.createScaledBitmap(bitmaphoto,newwidth,newheight,true);
+                    bitmaphoto.recycle();
+                    bitmaphoto = tempbitmap;
+                }
+
                 ByteArrayOutputStream btout = new ByteArrayOutputStream();
-                bitmapphoto.compress(Bitmap.CompressFormat.JPEG, 100, btout);
+                bitmaphoto.compress(Bitmap.CompressFormat.JPEG, 100, btout);
                 Image image = Image.getInstance(btout.toByteArray());
                 imagenes.add(image);
             }
         }catch (Exception e){
             e.printStackTrace();
         }
+
+        bmOptions.inJustDecodeBounds = true;
     }
     private PdfPCell getCell_15(int units, String par) {
         PdfPCell cell = new PdfPCell();
@@ -1352,63 +1452,67 @@ public class MainActivity extends AppCompatActivity {
         table = new PdfPTable(8);
         table.setTotalWidth(540);
 
+        Bitmap signaturebitmap, companybitmap;
+
+        Drawable drawable = getResources().getDrawable(R.drawable.squarewhiteshape);
+        Bitmap blankbitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
+                drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(blankbitmap);
+        drawable.setBounds(0,0,canvas.getWidth(),canvas.getHeight());
+        drawable.draw(canvas);
+
         try{
             String StoredPath = "signature.jpg";
             File f = new File(this.getApplicationContext().getFilesDir(),StoredPath);
-            Bitmap signaturebitmap = BitmapFactory.decodeStream(new FileInputStream(f));
-            if(signaturebitmap!=null) {
-                ByteArrayOutputStream btout = new ByteArrayOutputStream();
-                signaturebitmap.compress(Bitmap.CompressFormat.JPEG, 100, btout);
-                Image image = Image.getInstance(btout.toByteArray());
-                per = new PdfPCell(image, true);
-                per.setColspan(1);
-                per.setUseAscender(true);
-                per.setUseAscender(true);
-                per.setBorderWidth(0);
-                per.setHorizontalAlignment(Element.ALIGN_LEFT);
-                per.setPadding(5);
-                table.addCell(per);
-            }else{
-                per = new PdfPCell(new Paragraph(""));
-                per.setColspan(1);
-                per.setUseAscender(true);
-                per.setUseAscender(true);
-                per.setBorderWidth(0);
-                table.addCell(per);
-            }
+            signaturebitmap = BitmapFactory.decodeStream(new FileInputStream(f));
+        }catch (IOException e){
+            e.printStackTrace();
+            signaturebitmap = blankbitmap;
+        }
+        try{
+            String StoredPath2 = "logo.jpg";
+            File f2 = new File(this.getApplicationContext().getFilesDir(),StoredPath2);
+            companybitmap = BitmapFactory.decodeStream(new FileInputStream(f2));
+        }catch (IOException e){
+            e.printStackTrace();
+            companybitmap = blankbitmap;
+        }
+
+
+
+
+        try {
+            ByteArrayOutputStream btout = new ByteArrayOutputStream();
+            signaturebitmap.compress(Bitmap.CompressFormat.JPEG, 100, btout);
+            Image image = Image.getInstance(btout.toByteArray());
+            per = new PdfPCell(image, true);
+            per.setColspan(1);
+            per.setUseAscender(true);
+            per.setUseAscender(true);
+            per.setBorderWidth(0);
+            per.setHorizontalAlignment(Element.ALIGN_LEFT);
+            per.setPadding(5);
+            table.addCell(per);
 
             per = new PdfPCell(new Paragraph(""));
             per.setColspan(6);
             per.setUseAscender(true);
-            per.setUseAscender(true);
             per.setBorderWidth(0);
             table.addCell(per);
 
-            String StoredPath2 = "logo.jpg";
-            File f2 = new File(this.getApplicationContext().getFilesDir(),StoredPath2);
-            Bitmap companybitmap = BitmapFactory.decodeStream(new FileInputStream(f2));
-            if(companybitmap!=null) {
-                ByteArrayOutputStream btout2 = new ByteArrayOutputStream();
-                companybitmap.compress(Bitmap.CompressFormat.JPEG, 100, btout2);
-                Image image2 = Image.getInstance(btout2.toByteArray());
-                per = new PdfPCell(image2, true);
-                per.setColspan(1);
-                per.setUseAscender(true);
-                per.setUseAscender(true);
-                per.setBorderWidth(0);
-                per.setHorizontalAlignment(Element.ALIGN_RIGHT);
-                per.setPadding(5);
-                table.addCell(per);
-            }else {
-                per = new PdfPCell(new Paragraph(""));
-                per.setColspan(1);
-                per.setUseAscender(true);
-                per.setUseAscender(true);
-                per.setBorderWidth(0);
-                table.addCell(per);
-            }
+            ByteArrayOutputStream btout2 = new ByteArrayOutputStream();
+            companybitmap.compress(Bitmap.CompressFormat.JPEG, 100, btout2);
+            Image image2 = Image.getInstance(btout2.toByteArray());
+            per = new PdfPCell(image2, true);
+            per.setColspan(1);
+            per.setUseAscender(true);
+            per.setUseAscender(true);
+            per.setBorderWidth(0);
+            per.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            per.setPadding(5);
+            table.addCell(per);
 
-            tempstring = msharedpreferences.getString(OriginatorName,"");
+            tempstring = msharedpreferences.getString(OriginatorName, "");
             par = new Paragraph(tempstring, Cal9);
             per = new PdfPCell(par);
             per.setBorderWidth(0);
@@ -1418,26 +1522,25 @@ public class MainActivity extends AppCompatActivity {
             per.setHorizontalAlignment(PdfPCell.ALIGN_LEFT);
             table.addCell(per);
 
-            tempstring = msharedpreferences.getString(OriginatorCompany,"");
+            tempstring = msharedpreferences.getString(OriginatorCompany, "");
             par = new Paragraph(tempstring, Cal9);
             per = new PdfPCell(par);
             per.setBorderWidth(0);
             per.setColspan(4);
             per.setUseAscender(true);
-            per.setUseAscender(true);
             per.setHorizontalAlignment(PdfPCell.ALIGN_RIGHT);
             table.addCell(per);
 
-            tempstring = msharedpreferences.getString(OriginatorPosition,"");
+            tempstring = msharedpreferences.getString(OriginatorPosition, "");
             par = new Paragraph(tempstring, Cal9);
             per = new PdfPCell(par);
             per.setBorderWidth(0);
             per.setColspan(8);
             per.setUseAscender(true);
-            per.setUseAscender(true);
+
             table.addCell(per);
 
-        }catch (DocumentException | IOException e){
+        }catch (Exception e){
             e.printStackTrace();
         }
 

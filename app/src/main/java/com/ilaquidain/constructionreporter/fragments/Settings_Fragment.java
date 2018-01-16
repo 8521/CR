@@ -100,45 +100,47 @@ public class Settings_Fragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_settings,container,false);
         //((AppCompatActivity)getActivity()).getSupportActionBar().hide();
 
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Settings");
+
         msharedpreferences = getActivity().getPreferences(Context.MODE_PRIVATE);
         meditor = msharedpreferences.edit();
 
-        originatorname = (EditText)v.findViewById(R.id.settingoption1_1);
+        originatorname = v.findViewById(R.id.settingoption1_1);
         originatorname.setInputType(InputType.TYPE_CLASS_TEXT |
                 InputType.TYPE_TEXT_FLAG_CAP_SENTENCES |
                 InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         String s1 = msharedpreferences.getString(OriginatorName,null);
         if(s1!=null){originatorname.setText(s1);}
-        originatorpositoin = (EditText)v.findViewById(R.id.settingoption2_1);
+        originatorpositoin = v.findViewById(R.id.settingoption2_1);
         originatorpositoin.setInputType(InputType.TYPE_CLASS_TEXT |
                 InputType.TYPE_TEXT_FLAG_CAP_SENTENCES |
                 InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         String s2 = msharedpreferences.getString(OriginatorPosition,null);
         if(s2!=null){originatorpositoin.setText(s2);}
-        originatorcompany = (EditText)v.findViewById(R.id.settingoption3_1);
+        originatorcompany = v.findViewById(R.id.settingoption3_1);
         originatorcompany.setInputType(InputType.TYPE_CLASS_TEXT |
                 InputType.TYPE_TEXT_FLAG_CAP_SENTENCES |
                 InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         String s3 = msharedpreferences.getString(OriginatorCompany,null);
         if(s3!=null){originatorcompany.setText(s3);}
-        includemanpower = (Switch)v.findViewById(R.id.switch1);
+        includemanpower = v.findViewById(R.id.switch1);
         Boolean b1 = msharedpreferences.getBoolean(IncludeManpower,true);
         includemanpower.setChecked(b1);
-        includeequipment = (Switch)v.findViewById(R.id.switch2);
+        includeequipment = v.findViewById(R.id.switch2);
         Boolean b2 = msharedpreferences.getBoolean(IncludeEquipment,true);
         includeequipment.setChecked(b2);
-        includephotos = (Switch)v.findViewById(R.id.switch3);
+        includephotos = v.findViewById(R.id.switch3);
         Boolean b3 = msharedpreferences.getBoolean(IncludePhotos,true);
         includephotos.setChecked(b3);
-        includeconstructiondate = (Switch)v.findViewById(R.id.switch_constructiondate);
+        includeconstructiondate = v.findViewById(R.id.switch_constructiondate);
         Boolean b4 = msharedpreferences.getBoolean(IncludeConstructionDate,true);
         includeconstructiondate.setChecked(b4);
-        photosquality = (Spinner)v.findViewById(R.id.photoqualityspinner);
+        photosquality = v.findViewById(R.id.photoqualityspinner);
         String s4 = msharedpreferences.getString(PhotosQuality,"Medium");
         List<String> array = Arrays.asList(getResources().getStringArray(R.array.photoquality));
         photosquality.setSelection(array.indexOf(s4));
 
-        ImageButton save = (ImageButton)v.findViewById(R.id.btn_accept);
+        ImageButton save = v.findViewById(R.id.btn_accept);
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -162,7 +164,7 @@ public class Settings_Fragment extends Fragment {
             }
         });
 
-        ImageButton exit = (ImageButton)v.findViewById(R.id.btn_exit);
+        ImageButton exit = v.findViewById(R.id.btn_exit);
         exit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -173,7 +175,7 @@ public class Settings_Fragment extends Fragment {
 
 
 
-        ImageButton signature = (ImageButton)v.findViewById(R.id.editsignature);
+        ImageButton signature = v.findViewById(R.id.editsignature);
         signature.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -193,15 +195,15 @@ public class Settings_Fragment extends Fragment {
                     }
                 });
 
-                mContent = (LinearLayout) dialog.findViewById(R.id.linearLayout);
+                mContent = dialog.findViewById(R.id.linearLayout);
                 mSignature = new signature(getActivity(), null);
                 mSignature.setBackgroundColor(Color.WHITE);
                 // Dynamically generating Layout through java code
                 mContent.addView(mSignature, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-                mClear = (Button) dialog.findViewById(R.id.clear);
-                mGetSign = (Button) dialog.findViewById(R.id.getsign);
+                mClear = dialog.findViewById(R.id.clear);
+                mGetSign = dialog.findViewById(R.id.getsign);
                 mGetSign.setEnabled(false);
-                mCancel = (Button) dialog.findViewById(R.id.cancel);
+                mCancel = dialog.findViewById(R.id.cancel);
                 view3 = mContent;
 
                 mClear.setOnClickListener(new View.OnClickListener() {
@@ -236,7 +238,7 @@ public class Settings_Fragment extends Fragment {
 
         });
 
-        final ImageButton companylogo_btn = (ImageButton)v.findViewById(R.id.editcompanylogo);
+        final ImageButton companylogo_btn = v.findViewById(R.id.editcompanylogo);
         companylogo_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -276,10 +278,10 @@ public class Settings_Fragment extends Fragment {
 
                 companylogoview = (RectangularImageView)dialog2.findViewById(R.id.companylogo_view);
 
-                mClear2 = (Button)dialog2.findViewById(R.id.companylogo_clear);
-                mCancel2 = (Button)dialog2.findViewById(R.id.companylogo_cancel);
-                mSelect2 = (Button)dialog2.findViewById(R.id.companylogo_select);
-                mAccept2 = (Button)dialog2.findViewById(R.id.companylogo_accept);
+                mClear2 = dialog2.findViewById(R.id.companylogo_clear);
+                mCancel2 = dialog2.findViewById(R.id.companylogo_cancel);
+                mSelect2 = dialog2.findViewById(R.id.companylogo_select);
+                mAccept2 = dialog2.findViewById(R.id.companylogo_accept);
 
                 mClear2.setOnClickListener(new View.OnClickListener() {
                     @Override

@@ -3,28 +3,36 @@ package com.ilaquidain.constructionreporter.dialogfragments;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.FragmentManager;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.ilaquidain.constructionreporter.R;
 import com.ilaquidain.constructionreporter.activities.MainActivity;
 import com.ilaquidain.constructionreporter.object.Image_Object;
+import com.ilaquidain.constructionreporter.object.Project_Object;
 import com.ilaquidain.constructionreporter.object.Saved_Info_Object;
 
 import java.io.Serializable;
@@ -34,6 +42,10 @@ public class editphoto_dialogfragment extends DialogFragment implements View.OnC
     private Spinner spinner;
     private TextView textView2;
     private Image_Object photoobject;
+    private Integer projectnumber;
+    private Project_Object currentproject;
+    private SharedPreferences mpref;
+
 
     @Override
     public void onStart() {
@@ -51,22 +63,34 @@ public class editphoto_dialogfragment extends DialogFragment implements View.OnC
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.dialogfragment_photo,container,false);
 
-        Saved_Info_Object savedinfo = ((MainActivity)getActivity()).getSaved_info();
-        ArrayList<String> availableactivities = new ArrayList<>(savedinfo.getListasOpciones().get(9));
+        mpref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        projectnumber = mpref.getInt("projectnumber",-1);
+        if(projectnumber==-1){
+            if(getFragmentManager().getBackStackEntryCount() > 0){
+                getFragmentManager().popBackStack();}
+        }else{
+            currentproject = ((MainActivity)getActivity()).getSaved_info().getSavedProjects().get(projectnumber);
+        }
+
+        ArrayList<String> availableactivities = new ArrayList<>();
+        for(int i=0;i<currentproject.getListAvailableTasks().size();i++){
+            availableactivities.add(currentproject.getListAvailableTasks().
+            get(i).getTaskName());
+        }
         photoobject = (Image_Object)getArguments().getSerializable("photo");
         Bitmap photoshown = getArguments().getParcelable("bitmap");
         getArguments().remove("photo");
         getArguments().remove("bitmap");
 
-        ImageView imageView = (ImageView)v.findViewById(R.id.image1);
-        spinner = (Spinner) v.findViewById(R.id.spinner1);
+        ImageView imageView = v.findViewById(R.id.image1);
+        spinner = v.findViewById(R.id.spinner1);
 
-        TextView textView1 = (TextView)v.findViewById(R.id.textview1);
-        textView2 = (TextView)v.findViewById(R.id.textview2);
+        TextView textView1 = v.findViewById(R.id.textview1);
+        textView2 = v.findViewById(R.id.textview2);
 
         textView2.setOnClickListener(this);
 
-        FloatingActionButton fabaccept = (FloatingActionButton)v.findViewById(R.id.fabaccept);
+        FloatingActionButton fabaccept = v.findViewById(R.id.fabaccept);
         fabaccept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -96,48 +120,57 @@ public class editphoto_dialogfragment extends DialogFragment implements View.OnC
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.textview2:
+                if(getActivity().getCurrentFocus()!=null){
+                    getActivity().getCurrentFocus().clearFocus();
+                }
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                //LayoutInflater inflater = getActivity().getLayoutInflater();
-                View v3 = View.inflate(getActivity(),R.layout.builder_simpleadditem,null);
-                builder.setView(v3);
 
-                TextView title = (TextView)v3.findViewById(R.id.builder_title);
-                title.setText(getResources().getText(R.string.PhotoDescription));
-
-                final EditText editText = (EditText)v3.findViewById(R.id.edittext1);
-                editText.setInputType(InputType.TYPE_CLASS_TEXT |
+                builder.setTitle(getResources().getString(R.string.PhotoDescription));
+                LinearLayout ll1 = new LinearLayout(getActivity());
+                ll1.setOrientation(LinearLayout.VERTICAL);
+                ll1.setPadding(20,0,20,0);
+                TextView etxt_blank = new TextView(getActivity());
+                etxt_blank.setText("\n");
+                final EditText etxt_description = new EditText(getActivity());
+                etxt_description.setInputType(InputType.TYPE_CLASS_TEXT |
                         InputType.TYPE_TEXT_FLAG_CAP_SENTENCES |
                         InputType.TYPE_TEXT_FLAG_MULTI_LINE);
-                ImageButton accept = (ImageButton)v3.findViewById(R.id.fabaccept);
-                ImageButton cancel = (ImageButton)v3.findViewById(R.id.fabcancel);
-
                 if(photoobject.getPhotoDescription()!=null){
-                    editText.setText(photoobject.getPhotoDescription());
+                    etxt_description.setText(photoobject.getPhotoDescription());
                 }
+                ll1.addView(etxt_blank);
+                ll1.addView(etxt_description);
+                builder.setView(ll1);
 
-                final AlertDialog dialog = builder.create();
-                accept.setOnClickListener(new View.OnClickListener() {
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(View v) {
-                        String s1 = editText.getText().toString();
+                    public void onClick(DialogInterface dialog, int which) {
+                        String s1 = etxt_description.getText().toString();
                         if(!s1.equals("")){
                             photoobject.setPhotoDescription(s1);
                             textView2.setText(s1);
-                            dialog.dismiss();
                         }else {
-                            dialog.dismiss();
+                            etxt_description.setError("Field cannot be blank");
                         }
                     }
                 });
-                cancel.setOnClickListener(new View.OnClickListener() {
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(View v) {
-                        dialog.dismiss();
+                    public void onClick(DialogInterface dialog, int which) {
+
                     }
                 });
+
+                Dialog dialog = builder.create();
                 if(dialog.getWindow()!=null){
-                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));}
+                    dialog.getWindow().setSoftInputMode(WindowManager.
+                            LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+                    dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT);
+                    //etxt_description.hasFocus();
+                }
                 dialog.show();
+
         }
     }
 

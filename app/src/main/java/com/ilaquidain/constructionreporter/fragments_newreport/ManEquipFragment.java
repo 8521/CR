@@ -1,7 +1,9 @@
 package com.ilaquidain.constructionreporter.fragments_newreport;
 
+import android.app.Dialog;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -16,21 +18,30 @@ import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.ilaquidain.constructionreporter.R;
 import com.ilaquidain.constructionreporter.activities.MainActivity;
+import com.ilaquidain.constructionreporter.object.Contractor_Object;
+import com.ilaquidain.constructionreporter.object.Project_Object;
 import com.ilaquidain.constructionreporter.object.Report_Object;
 import com.ilaquidain.constructionreporter.object.Saved_Info_Object;
+import com.ilaquidain.constructionreporter.object.Task_Object;
 import com.ilaquidain.constructionreporter.object.Worker_Object;
 
 import java.util.ArrayList;
@@ -67,21 +78,20 @@ public class ManEquipFragment extends Fragment {
     private FloatingActionButton fabaccept;
     private int categoryselected;
 
-    private Spinner spinnerA; //Activities
-    private Spinner spinnerB; //Contractors
+    private Spinner spinner_activity;
+    private Spinner spinner_contractor;
     private ArrayAdapter<String> spinneradapterA;
     private ArrayAdapter<String> spinneradapterB;
     private ArrayList<String> spinnerlist_activities;
     private ArrayList<String> spinnerlist_contractors;
 
+    private Project_Object currentproject;
     private Report_Object currentreport;
     private Saved_Info_Object savedinfo;
 
     private Integer projectnumber, reportnumber;
     private SharedPreferences mpref;
     private SharedPreferences.Editor mprefedit;
-
-    private InputMethodManager imm;
 
     private void ExitMethod() {
         if(reportnumber==-1){
@@ -90,9 +100,9 @@ public class ManEquipFragment extends Fragment {
             savedinfo.getSavedProjects().get(projectnumber).getProjectReports().set(reportnumber,currentreport);
         }
         if(itemstype.equals(manpower)){
-            savedinfo.setListAvailableManpower(availableitemsarray);}
+            currentproject.setListAvailableManpower(availableitemsarray);}
         else if(itemstype.equals(equipment)){
-            savedinfo.setListAvailableEquipment(availableitemsarray);
+            currentproject.setListAvailableEquipment(availableitemsarray);
         }
         ((MainActivity)getActivity()).setSaved_info(savedinfo);
         if ( getFragmentManager().getBackStackEntryCount() > 0)
@@ -103,6 +113,7 @@ public class ManEquipFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, final Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.dialogfragment_manpower,container,false);
+
         level = level0;
 
         lightred = ContextCompat.getColor(getActivity(),R.color.selection_light_orange);
@@ -111,7 +122,7 @@ public class ManEquipFragment extends Fragment {
         projectnumber = mpref.getInt("projectnumber",-1);
         reportnumber = mpref.getInt("reportnumber",-1);
         itemstype = mpref.getString("itemstype",manpower);
-        titleview = (TextView)v.findViewById(R.id.recyclerviewtitle);
+        titleview = v.findViewById(R.id.recyclerviewtitle);
         if(itemstype.equals(manpower)){
             titleview.setText(title1);
         }else if(itemstype.equals(equipment)){
@@ -120,8 +131,10 @@ public class ManEquipFragment extends Fragment {
 
         savedinfo = ((MainActivity)getActivity()).getSaved_info();
         if(savedinfo!=null && projectnumber != -1 && reportnumber!=-1) {
+            currentproject = savedinfo.getSavedProjects().get(projectnumber);
             currentreport = savedinfo.getSavedProjects().get(projectnumber).getProjectReports().get(reportnumber);
-        }else if(savedinfo!=null && reportnumber==-1){
+        }else if(savedinfo!=null && projectnumber!= -1 &&reportnumber==-1){
+            currentproject = savedinfo.getSavedProjects().get(projectnumber);
             currentreport = savedinfo.getTempreport();
         }else{
             if ( getFragmentManager().getBackStackEntryCount() > 0)
@@ -130,14 +143,14 @@ public class ManEquipFragment extends Fragment {
 
         //currentreport.setSelectedWorkers(new ArrayList<Worker_Object>());
         if(itemstype.equals(manpower)){
-            grouparray = new ArrayList<>(savedinfo.getWorkerGroups());
-            availableitemsarray = new ArrayList<>(savedinfo.getListAvailableManpower());
+            grouparray = new ArrayList<>(currentproject.getWorkerGroups());
+            availableitemsarray = new ArrayList<>(currentproject.getListAvailableManpower());
         }else if (itemstype.equals(equipment)){
-            grouparray = new ArrayList<>(savedinfo.getEquipmentGroups());
-            availableitemsarray = new ArrayList<>(savedinfo.getListAvailableEquipment());
+            grouparray = new ArrayList<>(currentproject.getEquipmentGroups());
+            availableitemsarray = new ArrayList<>(currentproject.getListAvailableEquipment());
         }
 
-        FloatingActionButton fabadd = (FloatingActionButton)v.findViewById(R.id.fabaddmanpower);
+        FloatingActionButton fabadd = v.findViewById(R.id.fabaddmanpower);
         fabadd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -163,7 +176,7 @@ public class ManEquipFragment extends Fragment {
 
         });
 
-        fabaccept = (FloatingActionButton)v.findViewById(R.id.fabaccept);
+        fabaccept = v.findViewById(R.id.fabaccept);
         fabaccept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -192,16 +205,13 @@ public class ManEquipFragment extends Fragment {
         });
 
         madapter_6 = new Adapter_5(getActivity());
-        mrecyclerview_6 = (RecyclerView)v.findViewById(R.id.recyclerview_manpower);
+        mrecyclerview_6 = v.findViewById(R.id.recyclerview_manpower);
         mrecyclerview_6.setLayoutManager(new LinearLayoutManager(getActivity()));
         mrecyclerview_6.setAdapter(madapter_6);
 
         ItemTouchHelper.Callback callback_6 = new Callback_5(madapter_6);
         mhelper_6 = new ItemTouchHelper(callback_6);
         mhelper_6.attachToRecyclerView(mrecyclerview_6);
-
-        imm = (InputMethodManager) getActivity()
-                .getSystemService(Context.INPUT_METHOD_SERVICE);
 
         return v;
     }
@@ -387,11 +397,11 @@ public class ManEquipFragment extends Fragment {
                     grouparray.remove(position);
                     availableitemsarray.remove(position);
                     if(itemstype.equals(manpower)){
-                        savedinfo.setWorkerGroups(grouparray);
-                        savedinfo.setListAvailableManpower(availableitemsarray);
+                        currentproject.setWorkerGroups(grouparray);
+                        currentproject.setListAvailableManpower(availableitemsarray);
                     }else if(itemstype.equals(equipment)){
-                        savedinfo.setEquipmentGroups(grouparray);
-                        savedinfo.setListAvailableEquipment(availableitemsarray);
+                        currentproject.setEquipmentGroups(grouparray);
+                        currentproject.setListAvailableEquipment(availableitemsarray);
                     }
                     ((MainActivity)getActivity()).setSaved_info(savedinfo);
                     madapter_6.notifyDataSetChanged();
@@ -411,9 +421,9 @@ public class ManEquipFragment extends Fragment {
                     snackbar3.show();
                     availableitemsarray.get(categoryselected).remove(position);
                     if(itemstype.equals(manpower)){
-                        savedinfo.setListAvailableManpower(availableitemsarray);
+                        currentproject.setListAvailableManpower(availableitemsarray);
                     }else if(itemstype.equals(equipment)){
-                        savedinfo.setListAvailableEquipment(availableitemsarray);
+                        currentproject.setListAvailableEquipment(availableitemsarray);
                     }
                     ((MainActivity)getActivity()).setSaved_info(savedinfo);
                     madapter_6.notifyDataSetChanged();
@@ -435,10 +445,10 @@ public class ManEquipFragment extends Fragment {
             super(itemView);
             switch (level){
                 case level0:
-                    textView1 = (TextView)itemView.findViewById(R.id.text1);
-                    textView2 = (TextView)itemView.findViewById(R.id.text2);
-                    textView3 = (TextView)itemView.findViewById(R.id.text3);
-                    hourspinner = (Spinner)itemView.findViewById(R.id.hourspinner);
+                    textView1 = itemView.findViewById(R.id.text1);
+                    textView2 = itemView.findViewById(R.id.text2);
+                    textView3 = itemView.findViewById(R.id.text3);
+                    hourspinner = itemView.findViewById(R.id.hourspinner);
                     hourspinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                         @Override
                         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -456,17 +466,17 @@ public class ManEquipFragment extends Fragment {
                     });
                     break;
                 case level1:
-                    textView1 = (TextView)itemView.findViewById(R.id.text1);
+                    textView1 = itemView.findViewById(R.id.text1);
                     break;
                 case level2:
-                    textView1 = (TextView)itemView.findViewById(R.id.text1);
-                    textView2 = (TextView)itemView.findViewById(R.id.text2);
-                    textView3 = (TextView)itemView.findViewById(R.id.text3);
-                    editbutton = (ImageButton) itemView.findViewById(R.id.edit);
+                    textView1 = itemView.findViewById(R.id.text1);
+                    textView2 = itemView.findViewById(R.id.text2);
+                    textView3 = itemView.findViewById(R.id.text3);
+                    editbutton = itemView.findViewById(R.id.edit);
                     editbutton.setOnClickListener(this);
                     break;
                 default:
-                    textView1 = (TextView)itemView.findViewById(android.R.id.text1);
+                    textView1 = itemView.findViewById(android.R.id.text1);
                     break;
             }
 
@@ -631,105 +641,168 @@ public class ManEquipFragment extends Fragment {
 
     //dialog to add category
     private void showdialog1() {
+        if(getActivity().getCurrentFocus()!=null){
+            getActivity().getCurrentFocus().clearFocus();
+        }
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        final EditText etxt_category = new EditText(getActivity());
+        etxt_category.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(etxt_category);
 
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        View v5 = inflater.inflate(R.layout.builder_simpleadditem,null);
-        builder.setView(v5);
-
-        TextView title = (TextView)v5.findViewById(R.id.builder_title);
-
-        if(level.equals(level1)){title.setText("Add Manpower Category");}
-        else{title.setText("Add Manpower");}
-
-        final EditText editText = (EditText)v5.findViewById(R.id.edittext1);
-        ImageButton OK = (ImageButton)v5.findViewById(R.id.fabaccept);
-        ImageButton CANCEL =(ImageButton)v5.findViewById(R.id.fabcancel);
-
-        final AlertDialog dialog = builder.create();
-
-        OK.setOnClickListener(new View.OnClickListener() {
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                if(!editText.getText().toString().equals("")){
+            public void onClick(DialogInterface dialog, int which) {
+                if(!etxt_category.getText().toString().equals("")){
                     if(level.equals(level1)){
-                        grouparray.add(editText.getText().toString());
+                        grouparray.add(etxt_category.getText().toString());
                         availableitemsarray.add(new ArrayList<Worker_Object>());
                         if(itemstype.equals(manpower)) {
-                            savedinfo.setWorkerGroups(grouparray);
+                            currentproject.setWorkerGroups(grouparray);
                         }else if(itemstype.equals(equipment)){
-                            savedinfo.setEquipmentGroups(grouparray);
+                            currentproject.setEquipmentGroups(grouparray);
                         }
                         madapter_6.notifyDataSetChanged();
                     }else {
                         Worker_Object worker = new Worker_Object();
-                        worker.setName(editText.getText().toString());
+                        worker.setName(etxt_category.getText().toString());
                         availableitemsarray.get(categoryselected).add(worker);
                         madapter_6.notifyDataSetChanged();
                     }
+                }else {
+                    etxt_category.setError("Field cannot be blank");
                 }
-                dialog.dismiss();
-                imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),0);
             }
         });
-        CANCEL.setOnClickListener(new View.OnClickListener() {
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                dialog.dismiss();
+            public void onClick(DialogInterface dialog, int which) {
+
             }
         });
-        dialog.show();
-        editText.requestFocus();
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
 
+        AlertDialog dialog_newcategory = builder.create();
+        if(itemstype.equals(manpower)){
+            dialog_newcategory.setTitle("Add Manpower Category");
+        }else if(itemstype.equals(equipment)){
+            dialog_newcategory.setTitle("Add Equipment Category");
+        }
+
+        if(dialog_newcategory.getWindow()!=null){
+            dialog_newcategory.getWindow().setSoftInputMode
+                    (WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+            dialog_newcategory.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+            //etxt_category.hasFocus();
+        }
+        dialog_newcategory.show();
     }
     //dialog to add worker
     private void showdialog2(final Worker_Object worker, final int position, final int caso){
-        final AlertDialog.Builder builder = new AlertDialog.Builder(
-        new ContextThemeWrapper(getActivity(),R.style.dialogdatepicker));
+        if(getActivity().getCurrentFocus()!=null){
+            getActivity().getCurrentFocus().clearFocus();
+        }
+        AlertDialog.Builder builder_2 = new AlertDialog.Builder(getActivity());
 
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        View v3 = inflater.inflate(R.layout.builder_editworker,null);
-        builder.setView(v3);
+        if(worker!=null){
+            builder_2.setTitle("Edit Element");
+        }else {
+            builder_2.setTitle("New Element");
+        }
 
-        spinnerlist_activities = new ArrayList<>(savedinfo.getListasOpciones().get(9));
-        spinnerlist_contractors = new ArrayList<>(savedinfo.getListasOpciones().get(4));
+        LinearLayout ll_2 = new LinearLayout(getActivity());
+        ll_2.setOrientation(LinearLayout.VERTICAL);
+        ll_2.setPadding(20,0,20,0);
+        TextView txt_blank = new TextView(getActivity());
+        txt_blank.setText("\n");
+        TextView txt_name = new TextView(getActivity());
+        txt_name.setText("Name");
+        final EditText etxt_name = new EditText(getActivity());
+        TextView txt_activty = new TextView(getActivity());
+        txt_activty.setText("Activity");
+        TextView txt_contractor = new TextView(getActivity());
+        txt_contractor.setText("Contractor");
+        spinner_activity = new Spinner(getActivity());
+        spinner_contractor = new Spinner(getActivity());
+        spinner_activity.setPadding(5,5,5,5);
+        spinner_contractor.setPadding(5,5,5,5);
+        spinner_activity.setBackgroundColor(ContextCompat.getColor(getActivity(),R.color.colorSecondaryLight));
+        spinner_contractor.setBackgroundColor(ContextCompat.getColor(getActivity(),R.color.colorSecondaryLight));
+        ImageButton btn_add_activity = new ImageButton(getActivity());
+        ImageButton btn_add_contractor = new ImageButton(getActivity());
+        btn_add_activity.setImageDrawable(ContextCompat.getDrawable(getActivity(),R.drawable.ic_add_black_24dp));
+        btn_add_activity.setBackgroundColor(Color.TRANSPARENT);
+        btn_add_contractor.setImageDrawable(ContextCompat.getDrawable(getActivity(),R.drawable.ic_add_black_24dp));
+        btn_add_contractor.setBackgroundColor(Color.TRANSPARENT);
+        LinearLayout ll_3 = new LinearLayout(getActivity());
+        ll_3.setOrientation(LinearLayout.HORIZONTAL);
+        ll_3.setWeightSum(10);
+        LinearLayout.LayoutParams lp_3 = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT,2);
+        LinearLayout.LayoutParams lp_4 = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT,8);
+        spinner_activity.setLayoutParams(lp_3);
+        btn_add_activity.setLayoutParams(lp_4);
+        ll_3.addView(spinner_activity);
+        ll_3.addView(btn_add_activity);
+        LinearLayout ll_4 = new LinearLayout(getActivity());
+        ll_4.setOrientation(LinearLayout.HORIZONTAL);
+        ll_4.setWeightSum(10f);
+        spinner_contractor.setLayoutParams(lp_3);
+        btn_add_contractor.setLayoutParams(lp_4);
+        ll_4.addView(spinner_contractor);
+        ll_4.addView(btn_add_contractor);
 
-        final EditText edittext1 = (EditText)v3.findViewById(R.id.edittext1);
-        if(worker!=null){edittext1.setText(worker.getName());}
+        ll_2.addView(txt_blank);
+        ll_2.addView(txt_name);
+        ll_2.addView(etxt_name);
+        ll_2.addView(txt_activty);
+        ll_2.addView(ll_3);
+        ll_2.addView(txt_contractor);
+        ll_2.addView(ll_4);
 
-        ImageButton add_activity = (ImageButton)v3.findViewById(R.id.btn_addactivity);
-        ImageButton add_contractor = (ImageButton)v3.findViewById(R.id.btn_addcontractor);
-        add_activity.setOnClickListener(new View.OnClickListener() {
+
+        if(worker!=null){
+            etxt_name.setText(worker.getName());
+        }
+
+        spinnerlist_activities = new ArrayList<>();
+        for(int i =0;i<currentproject.getListAvailableTasks().size();i++){
+            spinnerlist_activities.add(currentproject.getListAvailableTasks().get(i).getTaskName());
+        }
+        spinnerlist_contractors = new ArrayList<>();
+        for(int i=0;i<currentproject.getProjectContractors().size();i++){
+            spinnerlist_contractors.add(currentproject.getProjectContractors().get(i).getContractor_name());
+        }
+
+        btn_add_activity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 add_activity_contractor("activity");
             }
         });
-        add_contractor.setOnClickListener(new View.OnClickListener() {
+        btn_add_contractor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 add_activity_contractor("contractor");
             }
         });
 
-        spinnerA = (Spinner)v3.findViewById(R.id.spinner1);
         if(!spinnerlist_activities.contains("N/A")){spinnerlist_activities.add(0,"N/A");}
         spinneradapterA = new ArrayAdapter<>(getActivity(),
-                R.layout.spinner_simpleitem,spinnerlist_activities);
-        spinneradapterA.setDropDownViewResource(R.layout.spinner_dropdownitem);
-
-        spinnerA.setAdapter(spinneradapterA);
+                android.R.layout.simple_spinner_item,spinnerlist_activities);
+        spinneradapterA.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner_activity.setAdapter(spinneradapterA);
         if(worker!=null && spinnerlist_activities.contains(worker.getActivity())){
-            spinnerA.setSelection(spinnerlist_activities.indexOf(worker.getActivity()));
+            spinner_activity.setSelection(spinnerlist_activities.indexOf(worker.getActivity()));
         }else {
-            spinnerA.setSelection(spinnerlist_activities.indexOf(savedinfo.getListasOpciones().get(0).get(9)));
+            spinner_activity.setSelection(spinnerlist_activities.indexOf(savedinfo.getListasOpciones().get(0).get(9)));
         }
-        spinnerA.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        spinner_activity.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 savedinfo.getListasOpciones().get(0).set(9,spinnerlist_activities.get(position));
-                spinnerA.setSelection(position);
+                spinner_activity.setSelection(position);
             }
 
             @Override
@@ -737,23 +810,21 @@ public class ManEquipFragment extends Fragment {
 
             }
         });
-
-        spinnerB = (Spinner)v3.findViewById(R.id.spinner2);
         if(!spinnerlist_contractors.contains("N/A")){spinnerlist_contractors.add(0,"N/A");}
         spinneradapterB = new ArrayAdapter<>(getActivity(),
-                R.layout.spinner_simpleitem,spinnerlist_contractors);
-        spinneradapterB.setDropDownViewResource(R.layout.spinner_dropdownitem);
-        spinnerB.setAdapter(spinneradapterB);
+                android.R.layout.simple_spinner_item,spinnerlist_contractors);
+        spinneradapterB.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner_contractor.setAdapter(spinneradapterB);
         if(worker!=null && spinnerlist_contractors.contains(worker.getCompany())){
-            spinnerB.setSelection(spinnerlist_contractors.indexOf(worker.getCompany()));
+            spinner_contractor.setSelection(spinnerlist_contractors.indexOf(worker.getCompany()));
         }else {
-            spinnerB.setSelection(spinnerlist_contractors.indexOf(savedinfo.getListasOpciones().get(0).get(4)));
+            spinner_contractor.setSelection(spinnerlist_contractors.indexOf(savedinfo.getListasOpciones().get(0).get(4)));
         }
-        spinnerB.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        spinner_contractor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 savedinfo.getListasOpciones().get(0).set(4,spinnerlist_contractors.get(position));
-                spinnerB.setSelection(position);
+                spinner_contractor.setSelection(position);
             }
 
             @Override
@@ -761,24 +832,16 @@ public class ManEquipFragment extends Fragment {
 
             }
         });
-        //linearlayout.addView(spinnerB);
-
-        //builder.setView(linearlayout);
-        ImageButton accept = (ImageButton)v3.findViewById(R.id.fabaccept);
-        ImageButton cancel = (ImageButton)v3.findViewById(R.id.fabcancel);
-
-        final AlertDialog dialog = builder.create();
-
-        accept.setOnClickListener(new View.OnClickListener() {
+        builder_2.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(DialogInterface dialog, int which) {
                 Worker_Object worker2;
                 if(worker==null){
                     worker2 = new Worker_Object();}
                 else {worker2 = worker;}
-                worker2.setName(edittext1.getText().toString());
-                worker2.setActivity(spinnerA.getSelectedItem().toString());
-                worker2.setCompany(spinnerB.getSelectedItem().toString());
+                worker2.setName(etxt_name.getText().toString());
+                worker2.setActivity(spinner_activity.getSelectedItem().toString());
+                worker2.setCompany(spinner_contractor.getSelectedItem().toString());
                 worker2.setHours("8");
                 if(position==-1 && caso ==0){//añadir nuevo
                     //si position = -1 estamos anadiendo un nuevo trabajador
@@ -794,13 +857,15 @@ public class ManEquipFragment extends Fragment {
                 }else{ //editar de la la lista de available
                     if(itemstype.equals(manpower)) {
                         for (int i = 0; i < currentreport.getSelectedWorkers().size(); i++) {
-                            if (currentreport.getSelectedWorkers().get(i).getIdNumber().equals(worker.getIdNumber())) {
+                            if (currentreport.getSelectedWorkers().get(i).getIdNumber()
+                                    .equals(worker.getIdNumber())) {
                                 currentreport.getSelectedWorkers().set(i, worker);
                             }
                         }
                     }else if (itemstype.equals(equipment)){
                         for (int i = 0; i < currentreport.getSelectedEquipment().size(); i++) {
-                            if (currentreport.getSelectedEquipment().get(i).getIdNumber().equals(worker.getIdNumber())) {
+                            if (currentreport.getSelectedEquipment().get(i).getIdNumber()
+                                    .equals(worker.getIdNumber())) {
                                 currentreport.getSelectedEquipment().set(i, worker);
                             }
                         }
@@ -808,75 +873,100 @@ public class ManEquipFragment extends Fragment {
                     availableitemsarray.get(categoryselected).set(position,worker2);
                 }
                 madapter_6.notifyDataSetChanged();
-                dialog.dismiss();
-                imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),0);
             }
         });
 
-
-        cancel.setOnClickListener(new View.OnClickListener() {
+        builder_2.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                dialog.dismiss();
+            public void onClick(DialogInterface dialog, int which) {
+
             }
         });
 
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialog.show();
-        edittext1.requestFocus();
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
+        builder_2.setView(ll_2);
+        Dialog dialog_edit = builder_2.create();
+
+        if(dialog_edit.getWindow()!=null){
+            dialog_edit.getWindow().setSoftInputMode
+                (WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+            dialog_edit.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+            //etxt_name.hasFocus();
+        }
+        dialog_edit.show();
+
     }
     private void add_activity_contractor(final String activity) {
+        if(getActivity().getCurrentFocus()!=null){
+            getActivity().getCurrentFocus().clearFocus();
+        }
         AlertDialog.Builder AddItemBuilder = new AlertDialog.Builder(getActivity());
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        View v4 = inflater.inflate(R.layout.builder_simpleadditem,null);
-        AddItemBuilder.setView(v4);
 
-        TextView title = (TextView)v4.findViewById(R.id.builder_title);
-        if(activity.equals("activity")){title.setText("New Activity");}else {
-            title.setText("New Contractor");
+        LinearLayout ll_5 = new LinearLayout(getActivity());
+        ll_5.setOrientation(LinearLayout.VERTICAL);
+        TextView txt_blank = new TextView(getActivity());
+        final EditText etxt_add_actcon = new EditText(getActivity());
+
+        ll_5.addView(txt_blank);
+        ll_5.addView(etxt_add_actcon);
+        AddItemBuilder.setView(ll_5);
+
+        if(activity.equals("activity")){
+            AddItemBuilder.setTitle("New Activity");
+        }else if (activity.equals("contractor")){
+            AddItemBuilder.setTitle("New Contractor");
         }
 
-        final EditText edittext = (EditText)v4.findViewById(R.id.edittext1);
-        ImageButton OK = (ImageButton)v4.findViewById(R.id.fabaccept);
-        ImageButton Cancel = (ImageButton)v4.findViewById(R.id.fabcancel);
-
-        final AlertDialog dialog = AddItemBuilder.create();
-
-        OK.setOnClickListener(new View.OnClickListener() {
+        AddItemBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                if(edittext.getText().toString().equals("")){
-                    dialog.dismiss();
+            public void onClick(DialogInterface dialog, int which) {
+                if(etxt_add_actcon.getText().toString().equals("")){
+                    etxt_add_actcon.setError("Field cannot be blank");
                 }else{
                     switch (activity){
                         case "activity":
-                            savedinfo.getListasOpciones().get(9).add(edittext.getText().toString());
-                            spinnerlist_activities.add(edittext.getText().toString());
+
+                            spinnerlist_activities.add(etxt_add_actcon.getText().toString());
+                            spinner_activity.setSelection(spinnerlist_activities.size()-1);
+                            Task_Object temptask = new Task_Object();
+                            temptask.setTaskName(etxt_add_actcon.getText().toString());
+                            currentproject.getListAvailableTasks().add(temptask);
+                            savedinfo.getListasOpciones().get(9).add(etxt_add_actcon.getText().toString());
                             spinneradapterA.notifyDataSetChanged();
                             break;
                         case "contractor":
-                            savedinfo.getListasOpciones().get(4).add(edittext.getText().toString());
-                            spinnerlist_contractors.add(edittext.getText().toString());
+                            spinnerlist_contractors.add(etxt_add_actcon.getText().toString());
+                            spinner_contractor.setSelection(spinnerlist_contractors.size()-1);
+                            Contractor_Object cont_obje = new Contractor_Object();
+                            cont_obje.setContractor_name(etxt_add_actcon.getText().toString());
+                            currentproject.getProjectContractors().add(cont_obje);
+                            savedinfo.getListasOpciones().get(4).add(etxt_add_actcon.getText().toString());
                             spinneradapterB.notifyDataSetChanged();
                             break;
                     }
                     dialog.dismiss();
-                    imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),0);
                 }
             }
         });
-        Cancel.setOnClickListener(new View.OnClickListener() {
+
+        AddItemBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                dialog.dismiss();
+            public void onClick(DialogInterface dialog, int which) {
+
             }
         });
 
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialog.show();
-        edittext.requestFocus();
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
+        Dialog dialog_add_actobje = AddItemBuilder.create();
+
+        if(dialog_add_actobje.getWindow()!=null){
+            dialog_add_actobje.getWindow().setSoftInputMode(WindowManager.
+            LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+            dialog_add_actobje.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+            //etxt_add_actcon.hasFocus();
+        }
+        dialog_add_actobje.show();
+
     }
 
 

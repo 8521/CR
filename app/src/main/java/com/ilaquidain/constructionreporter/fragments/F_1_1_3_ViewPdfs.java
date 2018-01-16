@@ -9,15 +9,20 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.transition.Transition;
+import android.support.transition.TransitionManager;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.ilaquidain.constructionreporter.R;
@@ -37,16 +42,20 @@ public class F_1_1_3_ViewPdfs extends Fragment{
 
     private RecyclerView mrecyclerview;
     private RecyclerView.Adapter madapter;
-    private Integer projectnumber, reportnumber;
+    private Integer projectnumber;
     private Saved_Info_Object savedinfo;
     private SharedPreferences mpref;
+    private int mExpandedPosition = -1;
+    private CoordinatorLayout coordinatorLayout;
+    private LinearLayout currentextededview;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_recyclerview,container,false);
+        View v = inflater.inflate(R.layout.fragment_viewpdfs,container,false);
         ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Select Report");
-        //((AppCompatActivity)getActivity()).getSupportActionBar().hide();
+
+        coordinatorLayout = v.findViewById(R.id.coordinatorlayout_2);
 
         savedinfo = ((MainActivity)getActivity()).getSaved_info();
         mpref = getActivity().getPreferences(Context.MODE_PRIVATE);
@@ -68,47 +77,14 @@ public class F_1_1_3_ViewPdfs extends Fragment{
                     Environment.DIRECTORY_DOCUMENTS)+"/ConstructionReporter",s1);
             ObtainProjectPDFS();
         }
-        mrecyclerview = (RecyclerView)v.findViewById(R.id.recyclerview);
+        mrecyclerview = v.findViewById(R.id.recyclerview);
         mrecyclerview.setLayoutManager(new LinearLayoutManager(getActivity()));
         madapter = new AdapterPDFS();
         mrecyclerview.setAdapter(madapter);
 
-        ItemTouchHelper.SimpleCallback callback = new ItemTouchHelper.SimpleCallback(
-                ItemTouchHelper.UP,ItemTouchHelper.RIGHT) {
-            @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                return false;
-            }
-
-            @Override
-            public void onSwiped(final RecyclerView.ViewHolder viewHolder, int direction) {
-                AlertDialog.Builder deletedialog = new AlertDialog.Builder(getActivity());
-                deletedialog.setMessage("Are you sure you want to delete this Report?");
-                deletedialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        File filetodelete = new File(filesPaths.get(viewHolder.getAdapterPosition()));
-                        boolean delete = filetodelete.delete();
-                        filesNames.remove(viewHolder.getAdapterPosition());
-                        filesPaths.remove(viewHolder.getAdapterPosition());
-                        madapter.notifyItemRemoved(viewHolder.getAdapterPosition());
-                    }
-                });
-                deletedialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        madapter.notifyDataSetChanged();
-                    }
-                });
-                deletedialog.show();
-            }
-        };
-        ItemTouchHelper itemtouchhelper = new ItemTouchHelper(callback);
-        itemtouchhelper.attachToRecyclerView(mrecyclerview);
-
-        /*DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mrecyclerview.getContext(),
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mrecyclerview.getContext(),
                 DividerItemDecoration.VERTICAL);
-        mrecyclerview.addItemDecoration(dividerItemDecoration);*/
+        mrecyclerview.addItemDecoration(dividerItemDecoration);
 
         return v;
     }
@@ -127,7 +103,7 @@ public class F_1_1_3_ViewPdfs extends Fragment{
     }
 
     private class AdapterPDFS extends RecyclerView.Adapter<ViewHolderPDFS>{
-        public AdapterPDFS() {
+        private AdapterPDFS() {
             super();
         }
 
@@ -140,7 +116,20 @@ public class F_1_1_3_ViewPdfs extends Fragment{
         @Override
         public void onBindViewHolder(ViewHolderPDFS holder, int position) {
             holder.textview1.setText(filesNames.get(position));
-            //holder.textview2.setText(filesPaths.get(position));
+            /*final int tempos = position;
+            final boolean isExpanded = position==mExpandedPosition;
+            holder.extendedview_pdf.setVisibility(isExpanded?View.VISIBLE:View.GONE);
+            holder.textview1.setText(filesNames.get(position));
+            holder.itemView.setActivated(isExpanded);
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mExpandedPosition = isExpanded ? -1:tempos;
+                    //TransitionManager.beginDelayedTransition(mrecyclerview);
+                    notifyDataSetChanged();
+                }
+            });*/
+
         }
 
         @Override
@@ -150,24 +139,76 @@ public class F_1_1_3_ViewPdfs extends Fragment{
     }
     private class ViewHolderPDFS extends RecyclerView.ViewHolder implements View.OnClickListener{
         final TextView textview1;
+        LinearLayout initialview;
+        LinearLayout extendedview;
+        TextView viewpdf;
+        TextView deletepdf;
         //final TextView textview2;
         public ViewHolderPDFS(View itemView) {
             super(itemView);
-            textview1 = (TextView)itemView.findViewById(R.id.text1);
-            //textview2 = (TextView)itemView.findViewById(R.id.cardview_text2);
-            itemView.setOnClickListener(this);
+            initialview = itemView.findViewById(R.id.initialview);
+            extendedview = itemView.findViewById(R.id.extendedview);
+
+            initialview.setOnClickListener(this);
+
+            textview1 = itemView.findViewById(R.id.text1);
+
+            viewpdf = itemView.findViewById(R.id.extended_pdf_view);
+            deletepdf = itemView.findViewById(R.id.extended_pdf_delete);
+            viewpdf.setOnClickListener(this);
+            deletepdf.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
-            Intent ViewPDFIntent = new Intent(Intent.ACTION_VIEW);
-            ViewPDFIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION |
-                    Intent.FLAG_ACTIVITY_NO_HISTORY);
-            File f = new File(filesPaths.get(getAdapterPosition()));
-            Uri uri = FileProvider.getUriForFile(getActivity(),
-                    "com.ilaquidain.constructionreporter.provider",f);
-            ViewPDFIntent.setDataAndType(uri,getActivity().getContentResolver().getType(uri));
-            startActivity(ViewPDFIntent);
+            switch (v.getId()){
+                case R.id.initialview:
+                    TransitionManager.beginDelayedTransition(coordinatorLayout);
+
+                    if(!extendedview.isShown()){
+                        if(mExpandedPosition!=-1){
+                            currentextededview.setVisibility(View.GONE);
+                        }
+                        currentextededview = extendedview;
+                        extendedview.setVisibility(View.VISIBLE);
+                        mExpandedPosition = getAdapterPosition();
+                    }
+
+                    break;
+
+                case R.id.extended_pdf_view:
+                    Intent ViewPDFIntent = new Intent(Intent.ACTION_VIEW);
+                    ViewPDFIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION |
+                            Intent.FLAG_ACTIVITY_NO_HISTORY);
+                    File f = new File(filesPaths.get(getAdapterPosition()));
+                    Uri uri = FileProvider.getUriForFile(getActivity(),
+                            "com.ilaquidain.constructionreporter.provider",f);
+                    ViewPDFIntent.setDataAndType(uri,getActivity().getContentResolver().getType(uri));
+                    startActivity(ViewPDFIntent);
+                    break;
+                case R.id.extended_pdf_delete:
+                    AlertDialog.Builder deletedialog = new AlertDialog.Builder(getActivity());
+                    deletedialog.setMessage("Are you sure you want to delete this Report?");
+                    deletedialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            File filetodelete = new File(filesPaths.get(getAdapterPosition()));
+                            boolean delete = filetodelete.delete();
+                            filesNames.remove(getAdapterPosition());
+                            filesPaths.remove(getAdapterPosition());
+                            madapter.notifyItemRemoved(getAdapterPosition());
+                        }
+                    });
+                    deletedialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            madapter.notifyDataSetChanged();
+                        }
+                    });
+                    deletedialog.show();
+                    break;
+            }
+
         }
     }
 }

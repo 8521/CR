@@ -96,22 +96,22 @@ public class F_1_1_1_NewReport extends Fragment implements View.OnClickListener{
             ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(s1);
         }
 
-        TextView title = (TextView)v.findViewById(R.id.newreport_title);
+        TextView title = v.findViewById(R.id.newreport_title);
         if(reportnumber==-1){title.setText(getResources().getText(R.string.NewReport));}
         else {title.setText(getResources().getText(R.string.EditReport));}
 
-        RelativeLayout lay1 = (RelativeLayout)v.findViewById(R.id.lay1);
+        RelativeLayout lay1 = v.findViewById(R.id.lay1);
         lay1.setOnClickListener(this);
-        RelativeLayout lay5 = (RelativeLayout)v.findViewById(R.id.lay5);
+        RelativeLayout lay5 = v.findViewById(R.id.lay5);
         lay5.setOnClickListener(this);
-        RelativeLayout lay6 = (RelativeLayout)v.findViewById(R.id.lay6);
+        RelativeLayout lay6 = v.findViewById(R.id.lay6);
         lay6.setOnClickListener(this);
-        RelativeLayout lay7 = (RelativeLayout)v.findViewById(R.id.lay7);
+        RelativeLayout lay7 = v.findViewById(R.id.lay7);
         lay7.setOnClickListener(this);
-        RelativeLayout lay8 = (RelativeLayout)v.findViewById(R.id.lay8);
+        RelativeLayout lay8 = v.findViewById(R.id.lay8);
         lay8.setOnClickListener(this);
-        FloatingActionButton fabaccept = (FloatingActionButton)v.findViewById(R.id.fabsave);
-        FloatingActionButton fabpdf = (FloatingActionButton)v.findViewById(R.id.fabpdf);
+        FloatingActionButton fabaccept = v.findViewById(R.id.fabsave);
+        FloatingActionButton fabpdf = v.findViewById(R.id.fabpdf);
         fabaccept.setOnClickListener(this);
         fabpdf.setOnClickListener(this);
 
@@ -143,23 +143,22 @@ public class F_1_1_1_NewReport extends Fragment implements View.OnClickListener{
 
     @Override
     public void onClick(View v) {
-        Fragment currentfragment = getActivity().getFragmentManager().findFragmentById(R.id.MainFrame);
         FragmentManager fm = getFragmentManager();
         switch (v.getId()){
             case R.id.lay1:
                 ReportInfoFragment reportinfo = new ReportInfoFragment();
-                //reportinfo.setTargetFragment(currentfragment,1002);
                 fm.beginTransaction()
-                        .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit)
+                        .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit,
+                                R.animator.slide_right_enter,R.animator.slide_left_exit)
                         .replace(R.id.MainFrame,reportinfo,getResources().getString(R.string.fragment_reportinfofragment))
                         .addToBackStack(getResources().getString(R.string.fragment_reportinfofragment))
                         .commit();
                 break;
             case R.id.lay5:
                 ReportTasksFragment fgmt7 = new ReportTasksFragment();
-                //fgmt7.setTargetFragment(currentfragment,1003);
                 fm.beginTransaction()
-                        .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit)
+                        .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit,
+                                R.animator.slide_right_enter,R.animator.slide_left_exit)
                         .replace(R.id.MainFrame,fgmt7,getResources().getString(R.string.fragment_reporttasksfragment))
                         .addToBackStack(getResources().getString(R.string.fragment_reporttasksfragment))
                         .commit();
@@ -167,42 +166,28 @@ public class F_1_1_1_NewReport extends Fragment implements View.OnClickListener{
             case R.id.lay6:
                 mpref.edit().putString("itemstype","manpower").apply();
                 ManEquipFragment fragment1 = new ManEquipFragment();
-                //fragment1.setTargetFragment(currentfragment,1005);
                 fm.beginTransaction()
-                        .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit)
+                        .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit,
+                                R.animator.slide_right_enter,R.animator.slide_left_exit)
                         .replace(R.id.MainFrame,fragment1,getResources().getString(R.string.fragment_equipmentfragment))
                         .addToBackStack(getResources().getString(R.string.fragment_equipmentfragment))
                         .commit();
-                /*ManpowerFragment dialogmanpower = new ManpowerFragment();
-                dialogmanpower.setTargetFragment(currentfragment,1004);
-                fm.beginTransaction()
-                        .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit)
-                        .replace(R.id.MainFrame,dialogmanpower,getResources().getString(R.string.fragment_manpowerfragment))
-                        .addToBackStack(getResources().getString(R.string.fragment_manpowerfragment))
-                        .commit();*/
                 break;
             case R.id.lay7:
                 mpref.edit().putString("itemstype","equipment").apply();
                 ManEquipFragment fragment2 = new ManEquipFragment();
-                //fragment2.setTargetFragment(currentfragment,1005);
                 fm.beginTransaction()
-                    .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit)
-                    .replace(R.id.MainFrame,fragment2,getResources().getString(R.string.fragment_equipmentfragment))
-                    .addToBackStack(getResources().getString(R.string.fragment_equipmentfragment))
-                    .commit();
-                /*EquipmentFragment dialogequipment = new EquipmentFragment();
-                dialogequipment.setTargetFragment(currentfragment,1005);
-                fm.beginTransaction()
-                        .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit)
-                        .replace(R.id.MainFrame,dialogequipment,getResources().getString(R.string.fragment_equipmentfragment))
+                        .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit,
+                                R.animator.slide_right_enter,R.animator.slide_left_exit)
+                        .replace(R.id.MainFrame,fragment2,getResources().getString(R.string.fragment_equipmentfragment))
                         .addToBackStack(getResources().getString(R.string.fragment_equipmentfragment))
-                        .commit()*/;
+                        .commit();
                 break;
             case R.id.lay8:
                 Photos_Fragment dialogphotos = new Photos_Fragment();
-                //dialogphotos.setTargetFragment(currentfragment,1006);
                 fm.beginTransaction()
-                        .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit)
+                        .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit,
+                                R.animator.slide_right_enter,R.animator.slide_left_exit)
                         .replace(R.id.MainFrame,dialogphotos,getResources().getString(R.string.fragment_photosfragment))
                         .addToBackStack(getResources().getString(R.string.fragment_photosfragment))
                         .commit();
@@ -215,6 +200,7 @@ public class F_1_1_1_NewReport extends Fragment implements View.OnClickListener{
                     mInterstitialAd.show();
                 } else {
                     Log.d("TAG", "The interstitial wasn't loaded yet.");
+                    ExitFragment(1);
                 }
                 mInterstitialAd.setAdListener(new AdListener(){
                     @Override
@@ -242,19 +228,13 @@ public class F_1_1_1_NewReport extends Fragment implements View.OnClickListener{
         //Si el informe ya existia y se habia guardado
         if(createpdf==1 && reportnumber != -1){
             new GeneratePDF().execute();
-            //((MainActivity)getActivity()).GeneratePDFReport(currentproject,reportnumber);
-            /*Toast toast = Toast.makeText(getActivity(),"PDF Report Created",Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.CENTER,0,0);
-            toast.show();*/
             //Si el informe no exisitia - primero se guarda y luego se genera el PDF
         }else if(createpdf==1){
             currentproject.getProjectReports().add(currentreport);
             savedinfo.getSavedProjects().set(projectnumber,currentproject);
             ((MainActivity)getActivity()).setSaved_info(savedinfo);
+            ((MainActivity)getActivity()).SaveInfoToMemory();
             new GeneratePDF().execute();
-            /*Toast toast = Toast.makeText(getActivity(),"PDF Report Created",Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.CENTER,0,0);
-            toast.show();*/
         } else {
             //Solo se guarda un informe nuevo per no se genera el` PDF
             if(reportnumber == -1){
@@ -265,21 +245,10 @@ public class F_1_1_1_NewReport extends Fragment implements View.OnClickListener{
             }
             Snackbar.make(getActivity().getWindow().getDecorView().getRootView().findViewById(R.id.relativelayout_newreport),
                     "Report Saved Succesfully",Snackbar.LENGTH_SHORT).show();
-            /*Toast toast = Toast.makeText(getActivity(),"Report Saved Succesfully",Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.CENTER,0,0);
-            toast.show();*/
         }
         savedinfo.getSavedProjects().set(projectnumber,currentproject);
         ((MainActivity)getActivity()).setSaved_info(savedinfo);
-
-        /*F_1_1_ProjectMenu fgmt = new F_1_1_ProjectMenu();
-        FragmentManager fm = getFragmentManager();
-        fm.beginTransaction()
-                .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit)
-                .replace(R.id.MainFrame,fgmt,getResources().getString(R.string.fragment_projectmenu))
-                .addToBackStack(getResources().getString(R.string.fragment_projectmenu))
-                .commit();*/
-
+        ((MainActivity)getActivity()).SaveInfoToMemory();
     }
 
     private class GeneratePDF extends AsyncTask<Void,Void,Void>{

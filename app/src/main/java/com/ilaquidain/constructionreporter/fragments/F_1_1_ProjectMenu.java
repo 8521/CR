@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -64,7 +65,7 @@ public class F_1_1_ProjectMenu extends Fragment implements View.OnClickListener 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_main,container,false);
 
-        mAdView = (AdView) v.findViewById(R.id.add_banner_1);
+        mAdView = v.findViewById(R.id.add_banner_1);
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice("BED5CEE69ABEED9A21B0D1A4819302F8")
                 .build();
@@ -80,32 +81,35 @@ public class F_1_1_ProjectMenu extends Fragment implements View.OnClickListener 
 
         //((AppCompatActivity)getActivity()).getSupportActionBar().show();
 
-        TextView projectname = (TextView)v.findViewById(R.id.projectname);
-        TextView projectref = (TextView)v.findViewById(R.id.projectrefno);
-        TextView projectaddress = (TextView)v.findViewById(R.id.projectaddress);
+        TextView projectname = v.findViewById(R.id.projectname);
+        TextView projectref = v.findViewById(R.id.projectrefno);
+        TextView projectaddress = v.findViewById(R.id.projectaddress);
         projectname.setText(currentproject.getProjectName());
         projectref.setText(currentproject.getProjectRefNo());
         projectaddress.setText(currentproject.getProjectAddress());
 
-        SquareImageView projectlogo = (SquareImageView)v.findViewById(R.id.ProjectLogo);
+        SquareImageView projectlogo = v.findViewById(R.id.ProjectLogo);
         String StoredPath2 = currentproject.getProjectId()+".jpg";
-        Bitmap bitmaplogo = null;
         try{
             File f = new File(getActivity().getApplicationContext().getFilesDir(),StoredPath2);
-            bitmaplogo = BitmapFactory.decodeStream(new FileInputStream(f));
-        }catch (Exception e){e.printStackTrace();}
-        if(bitmaplogo!=null){
+            Bitmap bitmaplogo = BitmapFactory.decodeStream(new FileInputStream(f));
             projectlogo.setImageBitmap(bitmaplogo);
+        }catch (Exception e){
+            e.printStackTrace();
+            //Drawable d = getResources().getDrawable(R.drawable.constructionreportericon);
+            //projectlogo.setImageDrawable(d);
         }
 
         fm = getFragmentManager();
 
-        RelativeLayout RelA = (RelativeLayout)v.findViewById(R.id.OptionA);
+        RelativeLayout RelA = v.findViewById(R.id.OptionA);
         RelA.setOnClickListener(this);
-        RelativeLayout RelB = (RelativeLayout)v.findViewById(R.id.OptionB);
+        RelativeLayout RelB = v.findViewById(R.id.OptionB);
         RelB.setOnClickListener(this);
-        RelativeLayout RelD = (RelativeLayout)v.findViewById(R.id.RelLay_ViewPDFs);
+        RelativeLayout RelD = v.findViewById(R.id.RelLay_ViewPDFs);
         RelD.setOnClickListener(this);
+        RelativeLayout RelE = v.findViewById(R.id.RelLay_EditContractors);
+        RelE.setOnClickListener(this);
 
         return v;
     }
@@ -143,6 +147,13 @@ public class F_1_1_ProjectMenu extends Fragment implements View.OnClickListener 
                         .addToBackStack(getResources().getString(R.string.fragment_viewpdfs))
                         .commit();
                 break;
+            case R.id.RelLay_EditContractors:
+                F_1_1_4_Contractors fgmt5 = new F_1_1_4_Contractors();
+                fm.beginTransaction()
+                        .setCustomAnimations(R.animator.slide_left_enter,R.animator.slide_right_exit)
+                        .replace(R.id.MainFrame,fgmt5,getResources().getString(R.string.fragment_contractors))
+                        .addToBackStack(getResources().getString(R.string.fragment_contractors))
+                        .commit();
         }
     }
 

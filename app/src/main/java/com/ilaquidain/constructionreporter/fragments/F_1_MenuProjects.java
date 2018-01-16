@@ -1,19 +1,24 @@
 package com.ilaquidain.constructionreporter.fragments;
 
+import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -87,20 +92,16 @@ public class F_1_MenuProjects extends Fragment implements View.OnClickListener{
         currentfragment = getActivity().getFragmentManager().findFragmentById(R.id.MainFrame);
         fm = getActivity().getFragmentManager();
 
-        mRecyclerView = (RecyclerView)v.findViewById(R.id.recyclerview);
+        mRecyclerView = v.findViewById(R.id.recyclerview);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        /*DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(),
-                DividerItemDecoration.VERTICAL);
-        mRecyclerView.addItemDecoration(dividerItemDecoration);*/
         mAdapter = new ProjectAdapter();
         mRecyclerView.setAdapter(mAdapter);
-
         ItemTouchHelper.Callback callback = new HelperCallback14(mAdapter);
         mitemTouchHelper = new ItemTouchHelper(callback);
         mitemTouchHelper.attachToRecyclerView(mRecyclerView);
 
 
-        FloatingActionButton fabaddproject = (FloatingActionButton)v.findViewById(R.id.fabadd);
+        FloatingActionButton fabaddproject = v.findViewById(R.id.fabadd);
         fabaddproject.setOnClickListener(this);
 
         return v;
@@ -130,16 +131,13 @@ public class F_1_MenuProjects extends Fragment implements View.OnClickListener{
             holder.projectname.setText(mProjects.get(position).getProjectName());
             holder.projectrefno.setText(mProjects.get(position).getProjectRefNo());
             holder.projectaddress.setText(mProjects.get(position).getProjectAddress());
-            bitmaplogo = null;
             String StoredPath2 = mProjects.get(position).getProjectId()+".jpg";
             try{
                 File f = new File(getActivity().getApplicationContext().getFilesDir(),StoredPath2);
-                bitmaplogo = BitmapFactory.decodeStream(new FileInputStream(f));
-            }catch (Exception e){e.printStackTrace();}
-            if(bitmaplogo!=null){
+                Bitmap bitmaplogo = BitmapFactory.decodeStream(new FileInputStream(f));
                 holder.projectlogo.setImageBitmap(bitmaplogo);
-            }else{
-                holder.projectlogo.setBackgroundColor(Color.TRANSPARENT);
+            }catch (Exception e){
+                e.printStackTrace();
             }
         }
 
@@ -157,19 +155,38 @@ public class F_1_MenuProjects extends Fragment implements View.OnClickListener{
         @Override
         public void onItemDismiss(final int position) {
             final Project_Object tempproject = mProjects.get(position);
-            Snackbar snackbar = Snackbar
-                    .make(mRecyclerView, "PROJECT REMOVED", Snackbar.LENGTH_LONG)
-                    .setAction("UNDO", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            mProjects.add(position,tempproject);
-                            notifyItemInserted(position);
-                            mRecyclerView.scrollToPosition(position);
-                        }
-                    });
-            snackbar.show();
-            mProjects.remove(position);
-            notifyItemRemoved(position);
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("Delete Project");
+            builder.setCancelable(false);
+            builder.setMessage("Are you sure you want to delete this project?");
+            builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Snackbar snackbar = Snackbar
+                            .make(mRecyclerView, "PROJECT REMOVED", Snackbar.LENGTH_LONG)
+                            .setAction("UNDO", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    mProjects.add(position,tempproject);
+                                    notifyItemInserted(position);
+                                    mRecyclerView.scrollToPosition(position);
+                                }
+                            });
+                    snackbar.show();
+                    mProjects.remove(position);
+                    saved_info_object.setSavedProjects(mProjects);
+                    ((MainActivity)getActivity()).setSaved_info(saved_info_object);
+                    notifyItemRemoved(position);
+                }
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    notifyDataSetChanged();
+                }
+            });
+            builder.show();
+
         }
     }
     private class ProjectViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, HelperViewHolder14{
@@ -181,13 +198,13 @@ public class F_1_MenuProjects extends Fragment implements View.OnClickListener{
         final ImageButton editproject;
         public ProjectViewHolder(View itemView) {
             super(itemView);
-            cardView = (CardView)itemView.findViewById(R.id.projectcardview);
-            RelativeLayout rellay = (RelativeLayout)cardView.findViewById(R.id.rellay_middle);
-            editproject = (ImageButton) itemView.findViewById(R.id.menu_icon);
-            projectname = (TextView)itemView.findViewById(R.id.projectname);
-            projectrefno = (TextView)itemView.findViewById(R.id.projectrefno);
-            projectaddress = (TextView)itemView.findViewById(R.id.projectaddress);
-            projectlogo = (SquareImageView)itemView.findViewById(R.id.ProjectLogo);
+            cardView = itemView.findViewById(R.id.projectcardview);
+            RelativeLayout rellay = cardView.findViewById(R.id.rellay_middle);
+            editproject = itemView.findViewById(R.id.menu_icon);
+            projectname = itemView.findViewById(R.id.projectname);
+            projectrefno = itemView.findViewById(R.id.projectrefno);
+            projectaddress = itemView.findViewById(R.id.projectaddress);
+            projectlogo = itemView.findViewById(R.id.ProjectLogo);
             rellay.setOnClickListener(this);
             editproject.setOnClickListener(this);
         }

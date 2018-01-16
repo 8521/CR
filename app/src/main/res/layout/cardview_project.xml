@@ -8,6 +8,7 @@
     android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <LinearLayout
+        android:baselineAligned="false"
         android:layout_width="match_parent"
         android:orientation="horizontal"
         android:background="@drawable/cardview1"
@@ -29,6 +30,7 @@
 
         <RelativeLayout
             android:id="@+id/rellay_middle"
+            android:background="?attr/selectableItemBackground"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="6">
@@ -76,7 +78,6 @@
                 android:layout_height="wrap_content"
                 android:src="@android:drawable/ic_menu_edit"
                 android:tint="@color/black"
-                android:background="@android:color/transparent"
                 android:layout_marginEnd="@dimen/dp10"/>
 
 

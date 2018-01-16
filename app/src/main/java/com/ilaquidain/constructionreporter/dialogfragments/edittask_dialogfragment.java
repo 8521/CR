@@ -45,12 +45,14 @@ public class edittask_dialogfragment extends DialogFragment implements View.OnCl
             }
         };
     }
-
     @Override
     public void onStart() {
         super.onStart();
+
         Dialog dialog = getDialog();
         if(dialog!=null){
+            getDialog().getWindow().setSoftInputMode(
+                    WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
             int Width = ViewGroup.LayoutParams.MATCH_PARENT;
             int Height = ViewGroup.LayoutParams.MATCH_PARENT;
             dialog.getWindow().setLayout(Width,Height);
@@ -78,11 +80,11 @@ public class edittask_dialogfragment extends DialogFragment implements View.OnCl
         }
 
         task = currentreport.getSelectedTasks().get(tasknumber);
-        editText = (EditText)v.findViewById(R.id.edittext1);
+        editText = v.findViewById(R.id.edittext1);
         editText.setInputType(InputType.TYPE_CLASS_TEXT |
                 InputType.TYPE_TEXT_FLAG_CAP_SENTENCES |
                 InputType.TYPE_TEXT_FLAG_MULTI_LINE);
-        TextView title = (TextView)v.findViewById(R.id.recyclerviewtitle);
+        TextView title = v.findViewById(R.id.recyclerviewtitle);
 
         if(task!=null){
             String s1 = task.getTaskName()+" Description";
@@ -90,7 +92,7 @@ public class edittask_dialogfragment extends DialogFragment implements View.OnCl
         editText.setText(task.getTaskDescription());
         editText.setSelection(editText.getText().length());}
 
-        FloatingActionButton fabaccept = (FloatingActionButton)v.findViewById(R.id.fabaccept);
+        FloatingActionButton fabaccept = v.findViewById(R.id.fabaccept);
         fabaccept.setOnClickListener(this);
 
         return v;

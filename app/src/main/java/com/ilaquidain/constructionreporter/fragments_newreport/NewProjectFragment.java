@@ -65,7 +65,7 @@ public class NewProjectFragment extends Fragment implements View.OnClickListener
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_projectinfo,container,false);
 
-        FloatingActionButton fabaccet = (FloatingActionButton)v.findViewById(R.id.fabaccept);
+        FloatingActionButton fabaccet = v.findViewById(R.id.fabaccept);
         fabaccet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -83,15 +83,15 @@ public class NewProjectFragment extends Fragment implements View.OnClickListener
         }
 
         projectid = currentproject.getProjectId();
-        projectname = (EditText)v.findViewById(R.id.df_projectinfo_3);
+        projectname = v.findViewById(R.id.df_projectinfo_3);
         projectname.setInputType(InputType.TYPE_CLASS_TEXT |
                 InputType.TYPE_TEXT_FLAG_CAP_SENTENCES |
                 InputType.TYPE_TEXT_FLAG_MULTI_LINE);
-        projectrefno = (EditText) v.findViewById(R.id.df_projectinfo_6);
+        projectrefno = v.findViewById(R.id.df_projectinfo_6);
         projectname.setInputType(InputType.TYPE_CLASS_TEXT |
                 InputType.TYPE_TEXT_FLAG_CAP_SENTENCES |
                 InputType.TYPE_TEXT_FLAG_MULTI_LINE);
-        projectaddress = (EditText) v.findViewById(R.id.df_projectinfo_9);
+        projectaddress = v.findViewById(R.id.df_projectinfo_9);
         projectaddress.setInputType(InputType.TYPE_CLASS_TEXT |
                 InputType.TYPE_TEXT_FLAG_CAP_SENTENCES |
                 InputType.TYPE_TEXT_FLAG_MULTI_LINE);
@@ -99,7 +99,7 @@ public class NewProjectFragment extends Fragment implements View.OnClickListener
         projectrefno.setText(currentproject.getProjectRefNo());
         projectaddress.setText(currentproject.getProjectAddress());
 
-        projectlogo = (RectangularImageView)v.findViewById(R.id.projectlogoview);
+        projectlogo = v.findViewById(R.id.projectlogoview);
         if(ContextCompat.checkSelfPermission(getActivity(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
             projectlogo.setEnabled(false);
@@ -119,7 +119,7 @@ public class NewProjectFragment extends Fragment implements View.OnClickListener
 
         projectlogo.setOnClickListener(this);
 
-        ImageButton deletelogo = (ImageButton)v.findViewById(R.id.deleteprojectlogo);
+        ImageButton deletelogo = v.findViewById(R.id.deleteprojectlogo);
         deletelogo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

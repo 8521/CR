@@ -37,10 +37,10 @@ public class Contractor_Object implements Parcelable,Serializable {
 
     public Contractor_Object(){
         this.contractor_id = UUID.randomUUID().toString();
-        this.contractor_name = " ";
-        this.contractor_address = " ";
-        this.contractor_ref_no = " ";
-        this.contractor_phone =" ";
+        this.contractor_name = null;
+        this.contractor_address = null;
+        this.contractor_ref_no = null;
+        this.contractor_phone =null;
     }
 
     private Contractor_Object(Parcel in){

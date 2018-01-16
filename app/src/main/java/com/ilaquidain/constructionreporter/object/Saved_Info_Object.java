@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class Saved_Info_Object implements Parcelable, Serializable{
 
-    private ArrayList<ArrayList<Worker_Object>> ListAvailableManpower;
+    /*private ArrayList<ArrayList<Worker_Object>> ListAvailableManpower;
     public void setListAvailableManpower(ArrayList<ArrayList<Worker_Object>> mListAvailableManpower){ListAvailableManpower = mListAvailableManpower;}
     public ArrayList<ArrayList<Worker_Object>> getListAvailableManpower(){return ListAvailableManpower;}
 
@@ -22,7 +22,7 @@ public class Saved_Info_Object implements Parcelable, Serializable{
 
     private ArrayList<String> EquipmentGroups;
     public void setEquipmentGroups(ArrayList<String> mEquipmentGroups){EquipmentGroups = mEquipmentGroups;}
-    public ArrayList<String> getEquipmentGroups(){return EquipmentGroups;}
+    public ArrayList<String> getEquipmentGroups(){return EquipmentGroups;}*/
 
     private ArrayList<ArrayList<String>> ListasOpciones;
     public void setListasOpciones(ArrayList<ArrayList<String>> mlistasopciones){ListasOpciones = mlistasopciones;}
@@ -37,10 +37,10 @@ public class Saved_Info_Object implements Parcelable, Serializable{
     public Report_Object getTempreport(){return tempreport;}
 
     public Saved_Info_Object(){
-        this.ListAvailableManpower = new ArrayList<>();
+        /*this.ListAvailableManpower = new ArrayList<>();
         this.ListAvailableEquipment = new ArrayList<>();
         this.WorkerGroups = new ArrayList<>();
-        this.EquipmentGroups = new ArrayList<>();
+        this.EquipmentGroups = new ArrayList<>();*/
         this.ListasOpciones = new ArrayList<>();
         this.SavedProjects = new ArrayList<>();
         this.tempreport = new Report_Object();
@@ -48,14 +48,14 @@ public class Saved_Info_Object implements Parcelable, Serializable{
     }
 
     private Saved_Info_Object(Parcel in){
-        ListAvailableManpower = new ArrayList<>();
+        /*ListAvailableManpower = new ArrayList<>();
         in.readList(ListAvailableManpower,null);
         ListAvailableEquipment = new ArrayList<>();
         in.readList(ListAvailableEquipment,null);
         WorkerGroups = new ArrayList<>();
         in.readList(WorkerGroups,null);
         EquipmentGroups = new ArrayList<>();
-        in.readList(EquipmentGroups,null);
+        in.readList(EquipmentGroups,null);*/
         ListasOpciones = new ArrayList<>();
         in.readList(ListasOpciones,null);
         SavedProjects = new ArrayList<>();
@@ -79,10 +79,10 @@ public class Saved_Info_Object implements Parcelable, Serializable{
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeList(ListasOpciones);
-        dest.writeList(ListAvailableManpower);
+        /*dest.writeList(ListAvailableManpower);
         dest.writeList(ListAvailableEquipment);
         dest.writeList(WorkerGroups);
-        dest.writeList(EquipmentGroups);
+        dest.writeList(EquipmentGroups);*/
         dest.writeList(SavedProjects);
         dest.writeSerializable(tempreport);
     }

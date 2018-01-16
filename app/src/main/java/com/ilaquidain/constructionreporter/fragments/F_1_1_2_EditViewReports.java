@@ -9,9 +9,13 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.transition.TransitionManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -20,6 +24,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,16 +49,20 @@ public class F_1_1_2_EditViewReports extends Fragment {
     private RecyclerView mrecyclerview;
     private adapter_edit_reports madapter;
     private ItemTouchHelper itemtouchhelper31;
-
+    private int mExpandedPosition = -1;
+    private LinearLayout currentshownextendview;
     private int projectnumber, reportnumber;
     private Saved_Info_Object savedinfo;
     private SharedPreferences mpref;
     private SharedPreferences.Editor mprefedit;
+    private CoordinatorLayout coordinatorLayout;
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_editreports,container,false);
         ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Select Report");
         //((AppCompatActivity)getActivity()).getSupportActionBar().hide();
+
+        coordinatorLayout = v.findViewById(R.id.coordinatorlayout_1);
 
         mpref = getActivity().getPreferences(Context.MODE_PRIVATE);
         projectnumber = mpref.getInt("projectnumber",-1);
@@ -65,14 +75,14 @@ public class F_1_1_2_EditViewReports extends Fragment {
             {getFragmentManager().popBackStack();}
         }
 
-        mrecyclerview = (RecyclerView)v.findViewById(R.id.recyclerview);
+        mrecyclerview = v.findViewById(R.id.recyclerview);
         mrecyclerview.setLayoutManager(new LinearLayoutManager(getActivity()));
         madapter = new adapter_edit_reports();
         mrecyclerview.setAdapter(madapter);
 
-        /*DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mrecyclerview.getContext(),
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mrecyclerview.getContext(),
                 DividerItemDecoration.VERTICAL);
-        mrecyclerview.addItemDecoration(dividerItemDecoration);*/
+        mrecyclerview.addItemDecoration(dividerItemDecoration);
 
         ItemTouchHelper.Callback callback = new HelperCallback31(madapter);
         itemtouchhelper31 = new ItemTouchHelper(callback);
@@ -96,17 +106,28 @@ public class F_1_1_2_EditViewReports extends Fragment {
 
         @Override
         public viewholder_edit_reports onCreateViewHolder(ViewGroup parent, int viewType) {
-            View v2 = LayoutInflater.from(parent.getContext()).inflate(R.layout.cardview_editreport,
+            View v2 = LayoutInflater.from(parent.getContext()).inflate(R.layout.cardview_editreport_2,
                     parent,false);
             return new viewholder_edit_reports(v2);
         }
 
         @Override
         public void onBindViewHolder(viewholder_edit_reports holder, int position) {
+
+            //final int tempos = position;
+            //final boolean isExpanded = position==mExpandedPosition;
+            //holder.extededview.setVisibility(isExpanded?View.VISIBLE:View.GONE);
             String s1 = "Daily Report Dated: " + savedreports.get(position).getReportInfo().get(8);
-            //String s2 = "Report ID: " + savedreports.get(position).getReportId();
             holder.textView1.setText(s1);
-            //holder.textView2.setText(s2);
+            //holder.itemView.setActivated(isExpanded);
+            /*holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mExpandedPosition = isExpanded ? -1:tempos;
+                    //TransitionManager.beginDelayedTransition(mrecyclerview);
+                    notifyDataSetChanged();
+                }
+            });*/
         }
 
         @Override
@@ -126,7 +147,7 @@ public class F_1_1_2_EditViewReports extends Fragment {
 
         @Override
         public void onItemDismiss(final int position) {
-            final Report_Object report = savedreports.get(position);
+            /*final Report_Object report = savedreports.get(position);
             Snackbar snackbar = Snackbar
                     .make(mrecyclerview, "ITEM REMOVED", Snackbar.LENGTH_LONG)
                     .setAction("UNDO", new View.OnClickListener() {
@@ -142,28 +163,54 @@ public class F_1_1_2_EditViewReports extends Fragment {
             currentproject.setProjectReports(savedreports);
             ((MainActivity)getActivity()).getSaved_info().getSavedProjects().get(projectnumber).
                     setProjectReports(savedreports);
-            notifyItemRemoved(position);
+            notifyItemRemoved(position);*/
         }
     }
     private class viewholder_edit_reports extends RecyclerView.ViewHolder implements
             HelperViewHolder31, View.OnClickListener {
         final TextView textView1;
-        ImageButton duplicatereport;
+        RelativeLayout initialview;
+        LinearLayout extededview;
+        TextView expanded_viewreport;
+        TextView expanded_deletereport;
+        TextView expanded_duplicatereport;
         //final TextView textView2;
 
         public viewholder_edit_reports(View itemView) {
             super(itemView);
-            textView1 = (TextView)itemView.findViewById(R.id.text1);
-            duplicatereport = (ImageButton) itemView.findViewById(R.id.duplicatereport);
-            //textView2 = (TextView)itemView.findViewById(R.id.cardview_text2);
-            textView1.setOnClickListener(this);
-            duplicatereport.setOnClickListener(this);
+            initialview = itemView.findViewById(R.id.initialview);
+            extededview = itemView.findViewById(R.id.extended_view);
+
+            initialview.setOnClickListener(this);
+
+            textView1 = itemView.findViewById(R.id.text1);
+
+            expanded_viewreport = itemView.findViewById(R.id.expanded_viewreport);
+            expanded_deletereport = itemView.findViewById(R.id.expanded_deletereport);
+            expanded_duplicatereport = itemView.findViewById(R.id.expanded_duplicate);
+            expanded_viewreport.setOnClickListener(this);
+            expanded_deletereport.setOnClickListener(this);
+            expanded_duplicatereport.setOnClickListener(this);
+
+
         }
 
         @Override
         public void onClick(View v) {
             switch (v.getId()){
-                case R.id.text1:
+                case R.id.initialview:
+                    TransitionManager.beginDelayedTransition(coordinatorLayout);
+                    if(!extededview.isShown()){
+                        if(mExpandedPosition!=-1){
+                            currentshownextendview.setVisibility(View.GONE);
+                        }
+
+                        extededview.setVisibility(View.VISIBLE);
+                        mExpandedPosition = getAdapterPosition();
+                        currentshownextendview = extededview;
+                    }
+                    break;
+                case R.id.expanded_viewreport:
                     FragmentManager fm = getFragmentManager();
                     F_1_1_1_NewReport fgmt = new F_1_1_1_NewReport();
                     mpref = getActivity().getPreferences(Context.MODE_PRIVATE);
@@ -175,7 +222,26 @@ public class F_1_1_2_EditViewReports extends Fragment {
                             .addToBackStack(getResources().getString(R.string.fragment_editreport))
                             .commit();
                     break;
-                case R.id.duplicatereport:
+                case R.id.expanded_deletereport:
+                    final Report_Object report = savedreports.get(getAdapterPosition());
+                    Snackbar snackbar = Snackbar
+                            .make(mrecyclerview, "ITEM REMOVED", Snackbar.LENGTH_LONG)
+                            .setAction("UNDO", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    savedreports.add(getAdapterPosition(),report);
+                                    madapter.notifyItemInserted(getAdapterPosition());
+                                    mrecyclerview.scrollToPosition(getAdapterPosition());
+                                }
+                            });
+                    snackbar.show();
+                    savedreports.remove(getAdapterPosition());
+                    currentproject.setProjectReports(savedreports);
+                    ((MainActivity)getActivity()).getSaved_info().getSavedProjects().get(projectnumber).
+                            setProjectReports(savedreports);
+                    madapter.notifyItemRemoved(getAdapterPosition());
+                    break;
+                case R.id.expanded_duplicate:
                     AlertDialog.Builder buider = new AlertDialog.Builder(getActivity());
                     buider.setMessage("Do you want to duplicate the report?");
                     buider.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -197,7 +263,7 @@ public class F_1_1_2_EditViewReports extends Fragment {
                             catch (Exception e){
                                 e.printStackTrace();
                                 Snackbar.make(getActivity().getWindow().getDecorView().getRootView().
-                                                findViewById(R.id.linearlayout_fragmenteditreports),
+                                                findViewById(R.id.coordinatorlayout_1),
                                         "Error Duplicating Report",Snackbar.LENGTH_SHORT).show();
                             }
                         }
@@ -216,7 +282,8 @@ public class F_1_1_2_EditViewReports extends Fragment {
 
         @Override
         public void onItemSelected() {
-            itemView.setBackgroundColor(Color.LTGRAY);
+            itemView.setBackgroundColor(ContextCompat.getColor(getActivity(),
+                    R.color.colorSecondaryLight));
         }
 
         @Override
@@ -247,7 +314,7 @@ public class F_1_1_2_EditViewReports extends Fragment {
         @Override
         public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
             final int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
-            final int swipeFlags = ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
+            final int swipeFlags = 0;
             return makeMovementFlags(dragFlags, swipeFlags);
         }
 
@@ -263,7 +330,7 @@ public class F_1_1_2_EditViewReports extends Fragment {
 
         @Override
         public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-            helperadapter.onItemDismiss(viewHolder.getAdapterPosition());
+            //helperadapter.onItemDismiss(viewHolder.getAdapterPosition());
         }
 
         @Override

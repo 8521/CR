@@ -109,15 +109,15 @@ public class chooselist_dialogfragment extends DialogFragment implements View.On
 
         View v = inflater.inflate(R.layout.dialogfragment_manpower,container,false);
 
-        FloatingActionButton fab = (FloatingActionButton)v.findViewById(R.id.fabaddmanpower);
+        FloatingActionButton fab = v.findViewById(R.id.fabaddmanpower);
         fab.setImageResource(R.drawable.ic_add_black_24dp);
         fab.setOnClickListener(this);
 
-        FloatingActionButton fab2 = (FloatingActionButton)v.findViewById(R.id.fabaccept);
+        FloatingActionButton fab2 = v.findViewById(R.id.fabaccept);
         fab2.setImageResource(R.drawable.ic_check_black_24dp);
         fab2.setOnClickListener(this);
 
-        mrecyclerview = (RecyclerView)v.findViewById(R.id.recyclerview_manpower);
+        mrecyclerview = v.findViewById(R.id.recyclerview_manpower);
         mrecyclerview.setLayoutManager(new LinearLayoutManager(getActivity()));
         madapter = new adapter_1();
         mrecyclerview.setAdapter(madapter);
@@ -200,7 +200,7 @@ public class chooselist_dialogfragment extends DialogFragment implements View.On
         final TextView textView;
         private viewholder_1(View itemView) {
             super(itemView);
-            textView = (TextView)itemView.findViewById(android.R.id.text1);
+            textView = itemView.findViewById(android.R.id.text1);
             textView.setOnClickListener(this);
         }
 
