@@ -1,0 +1,491 @@
+package com.ilaquidain.constructionreportersfi.qcreports;
+
+
+import android.Manifest;
+import android.app.Fragment;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
+import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.ViewFlipper;
+
+import com.ilaquidain.constructionreportersfi.R;
+import com.ilaquidain.constructionreportersfi.activities.MainActivity;
+import com.ilaquidain.constructionreportersfi.object.Image_Object;
+import com.ilaquidain.constructionreportersfi.object.Report_Object;
+import com.ilaquidain.constructionreportersfi.object.Saved_Info_Object;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Locale;
+
+import static android.app.Activity.RESULT_OK;
+
+public class f001014_QCnewreportphotos extends Fragment implements View.OnClickListener{
+
+    static final int PICK_IMAGE_4 = 423;
+    static final int scalefactor = 4;
+    private int positionsent;
+    private String mCurrentPhotoPath;
+    private BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+
+    private RecyclerView mrecyclerview;
+    private photoadapter madapter;
+    private ArrayList<Image_Object> photolist = new ArrayList<>();
+    private final ArrayList<Bitmap> photosshown = new ArrayList<>();
+    private ItemTouchHelper itemtouchhelper12;
+    private FloatingActionButton add_Photo;
+    private Report_Object currentreport;
+    private View v;
+    private Integer projectnumber, reportnumber, reporttypenumber;
+    private SharedPreferences mpref;
+    private Saved_Info_Object savedinfo;
+
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+        v = inflater.inflate(R.layout.f01014_qcnewreportphotos,container,false);
+        SetUpBitMapOptions();
+        mpref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        savedinfo = ((MainActivity)getActivity()).getSaved_info();
+        projectnumber = mpref.getInt("projectnumber", -1);
+        reporttypenumber = mpref.getInt("reporttypenumber",-1);
+        reportnumber = mpref.getInt("reportnumber",-1);
+
+        if(savedinfo!=null && projectnumber != -1  && reporttypenumber!=-1 && reportnumber!=-1) {
+            currentreport = savedinfo.getSavedProjects().get(projectnumber).getProjectReports()
+                    .get(reporttypenumber).get(reportnumber);
+        }else if(savedinfo!=null && projectnumber != -1 && reporttypenumber!=-1){
+            currentreport = savedinfo.getTemp_report();
+        }else{
+            if ( getFragmentManager().getBackStackEntryCount() > 0)
+            {getFragmentManager().popBackStack();}
+        }
+
+        if(photosshown.size()>0){photosshown.clear();}
+        new loadphotos().execute();
+
+        add_Photo = v.findViewById(R.id.fabaddphoto);
+        add_Photo.setOnClickListener(this);
+        FloatingActionButton fabaccept = v.findViewById(R.id.fabaccept);
+        fabaccept.setOnClickListener(this);
+
+        if(ContextCompat.checkSelfPermission(getActivity(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
+            add_Photo.setEnabled(false);
+            ActivityCompat.requestPermissions(getActivity(),new String[]
+                    {Manifest.permission.WRITE_EXTERNAL_STORAGE},0);
+        }
+
+
+        mrecyclerview = v.findViewById(R.id.recyclerview);
+        mrecyclerview.setLayoutManager(new GridLayoutManager(getActivity(),2));
+        madapter = new photoadapter();
+        mrecyclerview.setAdapter(madapter);
+
+        ItemTouchHelper.Callback callback = new HelperCallback12(madapter);
+        itemtouchhelper12 = new ItemTouchHelper(callback);
+        itemtouchhelper12.attachToRecyclerView(mrecyclerview);
+
+        return v;
+    }
+
+    private class loadphotos extends AsyncTask<Void,Void,Void>{
+        @Override
+        protected Void doInBackground(Void... params) {
+            if(currentreport!=null){
+                photolist=currentreport.getSelectedphotos();
+                for (int j=0;j<photolist.size();j++){
+                    AddBitmapOfPhotoTaken(photolist.get(j).getPathDevice());
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            v.findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            v.findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if(requestCode==0){
+            if(grantResults.length>0 &&
+                    grantResults[0]== PackageManager.PERMISSION_GRANTED &&
+                    grantResults[1]==PackageManager.PERMISSION_GRANTED){
+                add_Photo.setEnabled(true);
+            }
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.fabaddphoto:
+                add_photo_to_report();
+                break;
+            case R.id.fabaccept:
+                ExitMethod();
+                break;
+        }
+    }
+
+    private void ExitMethod() {
+        currentreport.setSelectedphotos(photolist);
+        if(reportnumber==-1){
+            savedinfo.setTemp_report(currentreport);
+        }else {
+            savedinfo.getSavedProjects().get(projectnumber).
+                    getProjectReports().get(reporttypenumber).set(reportnumber,currentreport);
+        }
+        ((MainActivity)getActivity()).setSaved_info(savedinfo);
+        if ( getFragmentManager().getBackStackEntryCount() > 0)
+        {getFragmentManager().popBackStack();}
+    }
+
+    private void add_photo_to_report() {
+        Intent pickphoto = new Intent();
+        pickphoto.setType("image/*");
+        pickphoto.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(pickphoto,"Select Image"),PICK_IMAGE_4);
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode==PICK_IMAGE_4 && resultCode==RESULT_OK && data!=null){
+            Uri uri1 = data.getData();
+            String photopath = getImagePathFromUri(uri1);
+            /*if(photopath==null){
+                Cursor cursor = getActivity().getContentResolver().
+                        query(uri1, null, null, null, null);
+                if (cursor == null) { // Source is Dropbox or other similar local file path
+                    photopath = uri1.getPath();
+                } else {
+                    cursor.moveToFirst();
+                    int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+                    photopath = cursor.getString(idx);
+                    cursor.close();
+                }
+            }*/
+            mCurrentPhotoPath = photopath;
+            File f = new File(photopath);
+            Date date1 = new Date(f.lastModified());
+            String photodate = new SimpleDateFormat("EEEE dd, MMM yyyy - HH:mm:ss", Locale.US).format(date1);
+            AddImageToList(photopath,photodate);
+        }else if(requestCode==2001 && resultCode==RESULT_OK&&data!=null){
+            Image_Object receivedimate = (Image_Object)data.getSerializableExtra("photo");
+            photolist.set(positionsent,receivedimate);
+        }
+    }
+    private void AddImageToList(String ImagePath, String ImageDate){
+        Image_Object  Photo2 = new Image_Object();
+        Photo2.setPathDevice(ImagePath);
+        Photo2.setPhotoDate(ImageDate);
+        photolist.add(Photo2);
+        AddBitmapOfPhotoTaken(ImagePath);
+        madapter.notifyDataSetChanged();
+        galleryAddPic();
+    }
+    private String getImagePathFromUri(Uri Uri1){
+
+        String pathfromuri = null;
+        if(Uri1 == null){return null;}
+        try {
+            String WholeID = DocumentsContract.getDocumentId(Uri1);
+            String id = WholeID.split(":")[1];
+            String[] column = {MediaStore.Images.Media.DATA};
+            String sel = MediaStore.Images.Media._ID+"=?";
+            Cursor cursor = getActivity().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    column, sel, new String[]{ id }, null);
+            int columnIndex = cursor.getColumnIndex(column[0]);
+            if (cursor.moveToFirst()) {pathfromuri = cursor.getString(columnIndex);}
+            cursor.close();
+        }catch (Exception e){
+            String[] filePathColumn = { MediaStore.Images.Media.DATA };
+            Cursor cursor = getActivity().getContentResolver().query(Uri1, filePathColumn, null, null, null);
+            cursor.moveToFirst();
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            pathfromuri = cursor.getString(columnIndex);
+            cursor.close();
+        }
+        return pathfromuri;
+        /*if(Build.VERSION.SDK_INT>=19){
+            String WholeID = DocumentsContract.getDocumentId(Uri1);
+            String id = WholeID.split(":")[1];
+            String[] column = {MediaStore.Images.Media.DATA};
+            String sel = MediaStore.Images.Media._ID+"=?";
+            Cursor cursor = getActivity().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    column, sel, new String[]{ id }, null);
+
+            int columnIndex = cursor.getColumnIndex(column[0]);
+
+            if (cursor.moveToFirst()) {
+                pathfromuri = cursor.getString(columnIndex);
+            }
+            cursor.close();
+            return pathfromuri;
+        }else{
+            String[] proj = { MediaStore.Images.Media.DATA };
+            pathfromuri = null;
+
+            CursorLoader cursorLoader = new CursorLoader(
+                    getActivity(),Uri1, proj, null, null, null);
+            Cursor cursor = cursorLoader.loadInBackground();
+
+            if(cursor != null){
+                int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                cursor.moveToFirst();
+                pathfromuri = cursor.getString(column_index);
+            }
+            return pathfromuri;
+        }*/
+    }
+    private void AddBitmapOfPhotoTaken(String PhotoPath){
+        Bitmap bitmap = BitmapFactory.decodeFile(PhotoPath, bmOptions);
+        photosshown.add(bitmap);
+    }
+    private void SetUpBitMapOptions() {
+        bmOptions = new BitmapFactory.Options();
+        bmOptions.inJustDecodeBounds = true;
+        bmOptions.inJustDecodeBounds = false;
+        bmOptions.inSampleSize = scalefactor;
+    }
+    private void galleryAddPic() {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(mCurrentPhotoPath);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        getActivity().sendBroadcast(mediaScanIntent);
+        MediaScannerConnection.scanFile(getActivity(), new String[]{mCurrentPhotoPath}, new String[]{"image/jpeg"}, null);
+    }
+
+    private class photoadapter extends RecyclerView.Adapter<photoviewholder> implements HelperAdapter12{
+        private final OnStarDragListener12 onStarDragListener12;
+
+        public photoadapter() {
+            super();
+            onStarDragListener12 = new OnStarDragListener12() {
+                @Override
+                public void onStartDrag12(RecyclerView.ViewHolder viewHolder) {
+                    itemtouchhelper12.startDrag(viewHolder);
+                }
+            };
+        }
+
+        @Override
+        public photoviewholder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View v2 = LayoutInflater.from(parent.getContext()).inflate(R.layout.rvitem_02b_photoitem,
+                    parent,false);
+            return new photoviewholder(v2);
+        }
+
+        @Override
+        public void onBindViewHolder(photoviewholder holder, int position) {
+            holder.view.setImageBitmap(photosshown.get(position));
+        }
+
+        @Override
+        public int getItemCount() {
+            return photosshown.size();
+        }
+
+        @Override
+        public boolean onItemMove(int fromPosition, int toPosition) {
+            Collections.swap(photolist,fromPosition,toPosition);
+            Collections.swap(photosshown,fromPosition,toPosition);
+            notifyItemMoved(fromPosition,toPosition);
+            return false;
+        }
+
+        @Override
+        public void onItemDismiss(final int position) {
+        }
+    }
+    private class photoviewholder extends RecyclerView.ViewHolder implements View.OnClickListener, HelperViewHolder12{
+        final ViewFlipper viewFlipper;
+        final ImageView view;
+        final Button viewphoto;
+        final Button deletephoto;
+
+        public photoviewholder(View itemView) {
+            super(itemView);
+            viewFlipper = itemView.findViewById(R.id.viewflipper);
+            viewphoto = itemView.findViewById(R.id.btn_viewphoto);
+            deletephoto = itemView.findViewById(R.id.btn_deletephoto);
+
+            viewphoto.setOnClickListener(this);
+            deletephoto.setOnClickListener(this);
+
+            view = itemView.findViewById(R.id.image1);
+            viewFlipper.setInAnimation(getActivity(),android.R.anim.slide_in_left);
+            viewFlipper.setOutAnimation(getActivity(),android.R.anim.slide_out_right);
+            viewFlipper.setOnClickListener(this);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()){
+                case R.id.viewflipper:
+                    viewFlipper.setDisplayedChild(1);
+                    android.os.Handler handler = new android.os.Handler();
+                    final Runnable r = new Runnable() {
+                        @Override
+                        public void run() {viewFlipper.setDisplayedChild(0);}};
+                    handler.postDelayed(r,1500);
+                    break;
+                case R.id.btn_viewphoto:
+                    Intent intent = new Intent();
+                    intent.setAction(Intent.ACTION_VIEW);
+                    File f8 = new File(photolist.get(getAdapterPosition()).getPathDevice());
+                    Uri PhotoUri2 = FileProvider.getUriForFile(getActivity(),
+                            "com.ilaquidain.constructionreportersfi.provider",f8);
+
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION |
+                            Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.setDataAndType(PhotoUri2,"image");
+                    startActivity(intent);
+                    break;
+                case R.id.btn_deletephoto:
+                    viewFlipper.setDisplayedChild(0);
+                    photolist.remove(getAdapterPosition());
+                    photosshown.remove(getAdapterPosition());
+                    madapter.notifyItemRemoved(getAdapterPosition());
+                    break;
+            }
+
+        }
+
+        @Override
+        public void onItemSelected() {
+            itemView.setBackgroundColor(
+                    ContextCompat.getColor(getActivity(),R.color.selection_light_orange)
+            );
+        }
+
+        @Override
+        public void onItemClear() {
+            itemView.setBackgroundColor(
+                    ContextCompat.getColor(getActivity(),R.color.white)
+            );
+        }
+    }
+    private class HelperCallback12 extends ItemTouchHelper.Callback{
+        private static final float ALPHA_FULL = 1.0f;
+
+        private final HelperAdapter12 helperadapter;
+
+        private HelperCallback12(HelperAdapter12 mhelperadapter){
+            helperadapter = mhelperadapter;
+        }
+
+        @Override
+        public boolean isLongPressDragEnabled() {
+            return true;
+        }
+
+        @Override
+        public boolean isItemViewSwipeEnabled() {
+            return true;
+        }
+
+        @Override
+        public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+            final int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN | ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
+            final int swipeFlags = 0;
+            return makeMovementFlags(dragFlags, swipeFlags);
+        }
+
+        @Override
+        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+            if (viewHolder.getItemViewType() != target.getItemViewType()) {
+                return false;
+            }
+
+            // Notify the adapter of the move
+            helperadapter.onItemMove(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+            return true;
+        }
+
+        @Override
+        public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+            helperadapter.onItemDismiss(viewHolder.getAdapterPosition());
+        }
+
+        @Override
+        public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+            if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                // Fade out the view as it is swiped out of the parent's bounds
+                final float alpha = ALPHA_FULL - Math.abs(dX) / (float) viewHolder.itemView.getWidth();
+                viewHolder.itemView.setAlpha(alpha);
+                viewHolder.itemView.setTranslationX(dX);
+            } else {
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            }
+        }
+
+        @Override
+        public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
+            if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
+                if (viewHolder instanceof HelperViewHolder12) {
+                    HelperViewHolder12 itemViewHolder = (HelperViewHolder12) viewHolder;
+                    itemViewHolder.onItemSelected();
+                }
+            }
+            super.onSelectedChanged(viewHolder, actionState);
+        }
+
+        @Override
+        public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+            super.clearView(recyclerView, viewHolder);
+            viewHolder.itemView.setAlpha(ALPHA_FULL);
+            if (viewHolder instanceof HelperViewHolder12) {
+                HelperViewHolder12 itemViewHolder = (HelperViewHolder12) viewHolder;
+                itemViewHolder.onItemClear();
+            }
+        }
+    }
+    private interface HelperAdapter12{
+        boolean onItemMove(int fromPosition, int toPosition);
+        void onItemDismiss(int position);
+    }
+    private interface HelperViewHolder12{
+        void onItemSelected();
+        void onItemClear();
+    }
+    private interface OnStarDragListener12{
+        void onStartDrag12(RecyclerView.ViewHolder viewHolder);
+    }
+}

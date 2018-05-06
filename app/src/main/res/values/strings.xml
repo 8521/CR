@@ -104,22 +104,121 @@
         <item>01/01/19</item>
     </string-array>
 
-    <string name="fragment_settings">fragment_settings</string>
-    <string name="fragment_menuprojects">fragment_menuprojects</string>
-    <string name="fragment_projectmenu">fragment_projectmenu</string>
-    <string name="fragment_viewpdfs">fragment_viewpdfs</string>
-    <string name="fragment_editviewreports">fragment_editviewreports</string>
-    <string name="fragment_newreport">fragment_newreport"</string>
-    <string name="fragment_equipmentfragment">fragment_equipmentfragment</string>
-    <string name="fragment_newprojectfragment">fragment_newprojectfragment</string>
-    <string name="fragment_photosfragment">fragment_photosfragment</string>
-    <string name="fragment_reportinfofragment">fragment_reportinfofragment</string>
-    <string name="fragment_reporttasksfragment">fragment_reporttasksfragment</string>
-    <string name="fragment_editreport">fragment_editreport</string>
-    <string name="fragment_contractors">fragment_contractors</string>
+    <string name="level00">level00</string>
+    <string name="level01">level01</string>
+    <string name="level02">level02</string>
+
+    <string name="level10">level10</string>
+        <string name="level101">level101</string>
+            <string name="level1011">level1011</string><!--info-->
+            <string name="level1012">level1012</string><!--activities-->
+            <string name="level1013">level1013</string><!--equipmanpower-->
+            <string name="level1014">level1014</string><!--photos-->
+        <string name="level102">level102</string>
+        <string name="level103">level103</string>
+
+    <string name="level20">level20</string>
+        <string name="level201">level201</string>
+            <string name="level2011">level2011</string>
+            <string name="level2012">level2012</string>
+            <string name="level2013">level2013</string>
+        <string name="level202">level202</string>
+        <string name="level203">level203</string>
+
+    <string name="level30">level30</string>
+    <string name="level40">level40</string>
+    <string name="level50">level50</string>
+    <string name="level60">level60</string>
+
+    <string name="level09">level09</string>
+
     <string name="IncludeConstructionDateInReport">Include Construction Date\nin Report</string>
     <string name="app_name_shorcut">Reporter</string>
     <string name="MainMenu_E">Edit Contractors</string>
     <string name="GeneratingPDFReport">Generating PDF\nReport</string>
+    <string name="Location">Location</string>
+    <string name="TypeOfWork">Type of Work</string>
+    <string name="ActivityID">Activity ID</string>
+    <string name="Contractor">Contractor</string>
+    <string name="IncludePhotoDateAndDescription">Include Photo Date\nand Description</string>
+    <string name="DailyQCReport">Daily QC Report</string>
+    <string name="DailyQAReport">Daily QA Report</string>
+    <string name="InspectionMaterialChecklist">Inspection Material Checklist</string>
+    <string name="SteelErectionChecklist">Steel Erection Checklist</string>
+    <string name="SafetyObservation">Safety Observation</string>
+    <string name="EquipmentManpower">Equipment / Manpower</string>
+    <string name="TimeIn">Time In</string>
+    <string name="TimeOut">Time Out</string>
+    <string name="Subcontractor">Subcontractor</string>
+    <string name="ContractNo">Contract No</string>
+    <string name="Section">Section</string>
+    <string name="Sky">Sky</string>
+    <string name="Wind">Wind</string>
+    <string name="Precipitation">Precipitation</string>
+    <string name="Temperature">Temperature</string>
+    <string name="High">High</string>
+    <string name="Low">Low</string>
+    <string name="StationLocation">Station / Location</string>
+    <string name="StructureNo">Structure No.</string>
+    <string name="DrawingSpecification">Drawing / Specification</string>
+    <string name="compliance">Compliance</string>
+    <string name="Yes">Yes</string>
+    <string name="No">No</string>
+    <string name="ActivityDescription">Activity Description</string>
+    <string name="nopeople"># People</string>
+    <string name="nohours"># Hours</string>
+    <string name="ActivitiesIDs">Activities IDs</string>
+    <string name="IncludePhotoDate">Include Photo Date</string>
+    <string name="CreateNewTimesheet">Create New Timesheet</string>
+    <string name="ViewEditExistingTimesheets">View/Edit Existing Timesheets</string>
+    <string name="ViewCreatedPDFTimesheets">View Created PDF Timesheets</string>
+    <string name="TimesheetInformation">Timesheet Information</string>
+    <string name="Labor">Labor</string>
+    <string name="TimesheetDate">Timesheet Date</string>
+    <string name="Time">Time</string>
+    <string name="StartBreak">Start Break</string>
+    <string name="EndBreak">End Break</string>
+    <string name="ForemanFirstName">Foreman First Name</string>
+    <string name="ForemanLastName">Foreman Last Name</string>
+    <string name="SafetyDocumentation">Safety Documents</string>
+    <string name="ProductionDocuments">Production Documents</string>
+    <string name="QCDocuments">QC Documents</string>
+    <string name="QADocuments">QA Documents</string>
+
+    <string name="S_MainFolder">ConstructionReporterSFI</string>
+    <integer name="reporttypenumber">2</integer>
+    <string-array name="reporttypes">
+        <item>QCReport</item>
+        <item>QAReport</item>
+    </string-array>
+
+    <string-array name="safetydocs">
+        <item>Safety Observation Checklist</item>
+        <item>Equipment Inspection Checklist</item>
+        <item>Near Miss Report</item>
+        <item>Incident Report</item>
+    </string-array>
+
+    <string-array name="qcdocs">
+        <item>QC Daily Reports</item>
+        <item>Inspection Notification</item>
+        <item>Material Inspection Checklist</item>
+        <item>RFI</item>
+    </string-array>
+
+    <string-array name="qadocs">
+        <item>QA Daily Report</item>
+        <item>Deficiency Report</item>
+        <item>Non-Conformance Report</item>
+    </string-array>
+
+    <string-array name="proddocs">
+        <item>Pre-task Plan</item>
+        <item>Timesheet</item>
+        <item>Field Requisition</item>
+        <item>Time and Material Ticket</item>
+    </string-array>
+
+    <integer name="listsofoptions">25</integer>
 
 </resources>

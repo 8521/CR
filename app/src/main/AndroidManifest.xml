@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.ilaquidain.constructionreporter">
+    package="com.ilaquidain.constructionreportersfi">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-
+    <!--android:roundIcon="@drawable/constructionreportericon"-->
     <application
         android:fullBackupContent="true"
         android:allowBackup="true"
-        android:icon="@drawable/constructionreportericon"
+        android:icon="@drawable/icono1"
         android:label="@string/app_name_shorcut"
-        android:roundIcon="@drawable/constructionreportericon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <provider
             android:name="android.support.v4.content.FileProvider"
-            android:authorities="com.ilaquidain.constructionreporter.provider"
+            android:authorities="com.ilaquidain.constructionreportersfi.provider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

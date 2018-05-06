@@ -8,12 +8,12 @@
             <solid
                 android:color="@color/white" />
             <size
-                android:height="600dp"
+                android:height="500dp"
                 android:width="400dp"/>
         </shape>
     </item>
     <item>
-        <bitmap android:src="@drawable/constructionreportersplashscreen"
+        <bitmap android:src="@drawable/splashscreen"
             android:gravity="center"
             />
     </item>

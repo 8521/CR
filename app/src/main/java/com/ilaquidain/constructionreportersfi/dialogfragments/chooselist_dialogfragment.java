@@ -1,0 +1,419 @@
+package com.ilaquidain.constructionreportersfi.dialogfragments;
+
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.InputType;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.TextView;
+
+import com.ilaquidain.constructionreportersfi.R;
+import com.ilaquidain.constructionreportersfi.activities.MainActivity;
+import com.ilaquidain.constructionreportersfi.object.Report_Object;
+import com.ilaquidain.constructionreportersfi.object.Saved_Info_Object;
+
+import java.util.ArrayList;
+import java.util.Collections;
+
+
+public class chooselist_dialogfragment extends DialogFragment implements View.OnClickListener {
+    private  DialogInterface.OnDismissListener onDismissListener2;
+
+    public void setOnDismissListener(DialogInterface.OnDismissListener onDismissListener2) {
+        this.onDismissListener2 = onDismissListener2;
+    }
+
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        super.onDismiss(dialog);
+        if (onDismissListener2 != null) {
+            onDismissListener2.onDismiss(dialog);
+        }
+    }
+
+    private int lightred;
+    private Integer Option2;
+    private String field1, selectedoption;
+    private Report_Object mcurrentreport;
+    private RecyclerView mrecyclerview;
+    private adapter_1 madapter;
+    private ArrayList<String> optionslist = new ArrayList<>();
+    private ItemTouchHelper itemtouchhelper9;
+    private Saved_Info_Object savedinfo;
+    private int reportnumber,projectnumber, reporttypenumber;
+    private SharedPreferences mpref;
+    private SharedPreferences.Editor mprefedit;
+
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        return new Dialog(getActivity(),getTheme()) {
+            @Override
+            public void onBackPressed() {
+                super.onBackPressed();
+                ExitMethod();
+            }
+        };
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Dialog dialog = getDialog();
+        if(dialog!=null){
+            int Width = ViewGroup.LayoutParams.MATCH_PARENT;
+            int Height = ViewGroup.LayoutParams.MATCH_PARENT;
+            dialog.getWindow().setLayout(Width,Height);
+        }
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.f02012_qanewreportactivities,container,false);
+
+        savedinfo = ((MainActivity)getActivity()).getSaved_info();
+        mpref = getActivity().getPreferences(Context.MODE_PRIVATE);
+
+        projectnumber = mpref.getInt("projectnumber", -1);
+        reporttypenumber = mpref.getInt("reporttypenumber",-1);
+        reportnumber = mpref.getInt("reportnumber",-1);
+        Option2 = mpref.getInt("option",-1);
+
+        if(savedinfo!=null && projectnumber != -1  && reporttypenumber!=-1 && reportnumber!=-1) {
+            mcurrentreport = savedinfo.getSavedProjects().get(projectnumber).getProjectReports()
+                    .get(reporttypenumber).get(reportnumber);
+        }else if(savedinfo!=null && projectnumber != -1 && reporttypenumber!=-1){
+            mcurrentreport = savedinfo.getTemp_report();
+        }else{
+            if ( getFragmentManager().getBackStackEntryCount() > 0)
+            {getFragmentManager().popBackStack();}
+        }
+
+        // option 1 - Default
+        // option 2 - Project Name
+        // option 3 - Project Address
+        // option 4 - List of contractors
+        // option 5 - Weather
+        // option 6 - Report Type
+        // option 7 - Report Discipline
+        // option 8 - Report Date
+        // option 9 - Activities
+        // option 10 - Start time
+        // option 11 - End time
+        // option 12 - Location
+        // option 13 - Contractor
+        // option 14 - Subcontractor
+        // option 15 - Contract no.
+        // option 16 - Section
+        // option 17 - weather sky
+        // option 18 - weather wind
+        // option 19 - weather precipitation
+        // option 20 - temperature low
+        // option 21 - temperature high
+        // option 22 - Structure No
+        // option 23 - Station
+        // option 24 - Report ID
+
+        lightred = ContextCompat.getColor(getActivity(),R.color.selection_light_orange);
+
+        //5 - weather / 6 - Report Type / 7 - Type of Work
+        TextView title1 = v.findViewById(R.id.recyclerviewtitle);
+        GetSelectedOption();
+        if(optionslist!=null && optionslist.size()>0){
+            switch (Option2){
+                case 17:
+                    title1.setText("Weather Sky");
+                    break;
+                case 18:
+                    title1.setText("Weather Wind");
+                    break;
+                case 19:
+                    title1.setText("Weather Precipitation");
+                    break;
+            }
+        }
+
+        FloatingActionButton fab = v.findViewById(R.id.fabaddmanpower);
+        fab.setImageResource(R.drawable.ic_add_black_24dp);
+        fab.setOnClickListener(this);
+
+        FloatingActionButton fab2 = v.findViewById(R.id.fabaccept);
+        fab2.setImageResource(R.drawable.ic_check_black_24dp);
+        fab2.setOnClickListener(this);
+
+        mrecyclerview = v.findViewById(R.id.recyclerview_manpower);
+        mrecyclerview.setLayoutManager(new LinearLayoutManager(getActivity()));
+        madapter = new adapter_1();
+        mrecyclerview.setAdapter(madapter);
+
+        ItemTouchHelper.Callback callback3 = new HelperCallback9(madapter);
+        itemtouchhelper9 = new ItemTouchHelper(callback3);
+        itemtouchhelper9.attachToRecyclerView(mrecyclerview);
+
+        return v;
+    }
+    private void GetSelectedOption() {
+        optionslist = savedinfo.getListasOpciones().get(Option2);
+        if(!mcurrentreport.getReportinfo().get(Option2).equals("")){
+            selectedoption = mcurrentreport.getReportinfo().get(Option2);
+        }
+    }
+    private class adapter_1 extends RecyclerView.Adapter<viewholder_1> implements HelperAdapter9{
+        private final OnStarDragListener9 mdraglistener8;
+
+        private adapter_1() {
+            super();
+            mdraglistener8 = new OnStarDragListener9() {
+                @Override
+                public void onStartDrag2(RecyclerView.ViewHolder viewHolder) {
+                    itemtouchhelper9.startDrag(viewHolder);
+                }
+            };
+        }
+
+        @Override
+        public viewholder_1 onCreateViewHolder(ViewGroup parent, int viewType) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_list_item_1,
+                    parent,false);
+            return new viewholder_1(v);
+        }
+
+        @Override
+        public void onBindViewHolder(viewholder_1 holder, int position) {
+            holder.textView.setBackgroundColor(0);
+            if(optionslist.get(position).equals(selectedoption)){
+                holder.textView.setBackgroundColor(lightred);
+            }
+            holder.textView.setText(optionslist.get(position));
+        }
+
+        @Override
+        public int getItemCount() {
+            return optionslist.size();
+        }
+
+        @Override
+        public boolean onItemMove(int fromPosition, int toPosition) {
+            Collections.swap(optionslist,fromPosition,toPosition);
+            notifyItemMoved(fromPosition,toPosition);
+            return false;
+        }
+
+        @Override
+        public void onItemDismiss(final int position) {
+            final String s1 = optionslist.get(position);
+            Snackbar snackbar = Snackbar
+                    .make(mrecyclerview, "ITEM REMOVED", Snackbar.LENGTH_LONG)
+                    .setAction("UNDO", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            optionslist.add(position,s1);
+                            notifyItemInserted(position);
+                            mrecyclerview.scrollToPosition(position);
+                        }
+                    });
+            snackbar.show();
+            optionslist.remove(position);
+            notifyItemRemoved(position);
+        }
+    }
+    private class viewholder_1 extends RecyclerView.ViewHolder implements View.OnClickListener, HelperViewHolder9{
+        final TextView textView;
+        private viewholder_1(View itemView) {
+            super(itemView);
+            textView = itemView.findViewById(android.R.id.text1);
+            textView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            selectedoption = optionslist.get(getAdapterPosition());
+            madapter.notifyDataSetChanged();
+            final android.os.Handler handler = new android.os.Handler();
+            final Runnable r = new Runnable() {
+                @Override
+                public void run() {
+                    ExitMethod();
+                }
+            };
+            handler.postDelayed(r,300);
+        }
+        @Override
+        public void onItemSelected() {
+            itemView.setBackgroundColor(Color.LTGRAY);
+        }
+
+        @Override
+        public void onItemClear() {
+            itemView.setBackgroundColor(0);
+        }
+    }
+    private void ExitMethod() {
+        //Guradamos la lista de posibles opciones y la opcion default
+        savedinfo.getListasOpciones().set(Option2,optionslist);
+        savedinfo.getListasOpciones().get(0).set(Option2,selectedoption);
+        if(reportnumber==-1){
+            savedinfo.getTemp_report().getReportinfo().set(Option2,selectedoption);
+        }else{
+            savedinfo.getSavedProjects().get(projectnumber).getProjectReports().
+                    get(reporttypenumber).get(reportnumber).getReportinfo().set(Option2,selectedoption);
+        }
+
+        ((MainActivity)getActivity()).setSaved_info(savedinfo);
+        getDialog().dismiss();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.fabaddmanpower:
+                showinputdialog();
+                break;
+            case R.id.fabaccept:
+                ExitMethod();
+                break;
+        }
+    }
+    private void showinputdialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Add New Option");
+        final EditText edittext = new EditText(getActivity());
+        edittext.setInputType(InputType.TYPE_CLASS_TEXT |
+                InputType.TYPE_TEXT_FLAG_CAP_SENTENCES |
+                InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        builder.setView(edittext);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(!edittext.getText().toString().equals("")&&
+                        !optionslist.contains(edittext.getText().toString())){
+                    optionslist.add(edittext.getText().toString());
+                    selectedoption = edittext.getText().toString();
+                    madapter.notifyDataSetChanged();
+                    final android.os.Handler handler = new android.os.Handler();
+                    final Runnable r = new Runnable() {
+                        @Override
+                        public void run() {
+                            ExitMethod();
+                        }
+                    };
+                    handler.postDelayed(r,300);
+                }else{
+                    selectedoption = edittext.getText().toString();
+                    madapter.notifyDataSetChanged();
+                }
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.show();
+    }
+
+
+    private class HelperCallback9 extends ItemTouchHelper.Callback{
+        private static final float ALPHA_FULL = 1.0f;
+
+        private final HelperAdapter9 helperadapter;
+
+        private HelperCallback9(HelperAdapter9 mhelperadapter){
+            helperadapter = mhelperadapter;
+        }
+
+        @Override
+        public boolean isLongPressDragEnabled() {
+            return true;
+        }
+
+        @Override
+        public boolean isItemViewSwipeEnabled() {
+            return true;
+        }
+
+        @Override
+        public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+            final int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
+            final int swipeFlags = ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
+            return makeMovementFlags(dragFlags, swipeFlags);
+        }
+
+        @Override
+        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+            if (viewHolder.getItemViewType() != target.getItemViewType()) {
+                return false;
+            }
+
+            // Notify the adapter of the move
+            helperadapter.onItemMove(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+            return true;
+        }
+
+        @Override
+        public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+            helperadapter.onItemDismiss(viewHolder.getAdapterPosition());
+        }
+
+        @Override
+        public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+            if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                // Fade out the view as it is swiped out of the parent's bounds
+                final float alpha = ALPHA_FULL - Math.abs(dX) / (float) viewHolder.itemView.getWidth();
+                viewHolder.itemView.setAlpha(alpha);
+                viewHolder.itemView.setTranslationX(dX);
+            } else {
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            }
+        }
+
+        @Override
+        public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
+            if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
+                if (viewHolder instanceof HelperViewHolder9) {
+                    HelperViewHolder9 itemViewHolder = (HelperViewHolder9) viewHolder;
+                    itemViewHolder.onItemSelected();
+                }
+            }
+            super.onSelectedChanged(viewHolder, actionState);
+        }
+
+        @Override
+        public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+            super.clearView(recyclerView, viewHolder);
+            viewHolder.itemView.setAlpha(ALPHA_FULL);
+            if (viewHolder instanceof HelperViewHolder9) {
+                HelperViewHolder9 itemViewHolder = (HelperViewHolder9) viewHolder;
+                itemViewHolder.onItemClear();
+            }
+        }
+    }
+
+    private interface HelperAdapter9{
+        boolean onItemMove(int fromPosition, int toPosition);
+        void onItemDismiss(int position);
+    }
+    private interface HelperViewHolder9{
+        void onItemSelected();
+        void onItemClear();
+    }
+    private interface OnStarDragListener9{
+        void onStartDrag2(RecyclerView.ViewHolder viewHolder);
+    }
+}

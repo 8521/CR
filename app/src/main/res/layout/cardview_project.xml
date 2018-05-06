@@ -18,12 +18,12 @@
             android:layout_width="0dp"
             android:layout_weight="2"
             android:layout_height="match_parent">
-            <com.ilaquidain.constructionreporter.object.SquareImageView
+            <com.ilaquidain.constructionreportersfi.object.SquareImageView
                 android:id="@+id/ProjectLogo"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_centerVertical="true"
-                android:background="@color/white"
+                android:background="@color/lightgray"
                 android:layout_marginStart="@dimen/dp10"
                 android:layout_marginEnd="@dimen/dp10"/>
         </RelativeLayout>
@@ -76,6 +76,7 @@
                 android:layout_centerVertical="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="@null"
                 android:src="@android:drawable/ic_menu_edit"
                 android:tint="@color/black"
                 android:layout_marginEnd="@dimen/dp10"/>

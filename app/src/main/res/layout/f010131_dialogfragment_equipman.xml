@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:background="@color/settings_gray">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="80dp"
+        android:background="@color/white">
+        <!--activityid-->
+        <TextView
+            android:layout_margin="@dimen/dp10"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/Equipment"
+            style="@style/textstyle_A"/>
+        <EditText
+            android:id="@+id/input1_equipmandf"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/lightgray"
+            style="@style/textstyle_B"
+            android:layout_marginStart="@dimen/dp10"
+            android:layout_marginEnd="@dimen/dp10"
+            android:padding="@dimen/dp5" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/settings_gray"
+            android:layout_marginTop="@dimen/dp10"/>
+        <!--drawing / specification-->
+        <TextView
+            android:layout_margin="@dimen/dp10"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/nopeople"
+            style="@style/textstyle_A"/>
+        <EditText
+            android:id="@+id/input2_equipmandf"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/lightgray"
+            style="@style/textstyle_B"
+            android:inputType="number"
+            android:layout_marginStart="@dimen/dp10"
+            android:layout_marginEnd="@dimen/dp10"
+            android:padding="@dimen/dp5" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/settings_gray"
+            android:layout_marginTop="@dimen/dp10"/>
+        <!--drawing / specification-->
+        <TextView
+            android:layout_margin="@dimen/dp10"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/nohours"
+            style="@style/textstyle_A"/>
+        <EditText
+            android:id="@+id/input3_equipmandf"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/lightgray"
+            style="@style/textstyle_B"
+            android:inputType="number"
+            android:layout_marginStart="@dimen/dp10"
+            android:layout_marginEnd="@dimen/dp10"
+            android:padding="@dimen/dp5" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/settings_gray"
+            android:layout_marginTop="@dimen/dp10"/>
+
+    </LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabaccept"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:backgroundTint="@color/colorSecondary"
+        android:src="@drawable/ic_check_black_24dp"
+        android:layout_margin="@dimen/dp10"
+        android:layout_gravity="end|bottom" />
+</FrameLayout>
